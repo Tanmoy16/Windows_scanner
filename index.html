@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WinScan Pro - Vulnerability Scanner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>WinScan Pro</h2>
+      <ul>
+        <li><a href="#" onclick="showPage('dashboard')">Dashboard</a></li>
+        <li><a href="#" onclick="showPage('new-scan')">New Scan</a></li>
+        <li><a href="#" onclick="showPage('scan-results')">Scan Results</a></li>
+        <li><a href="#" onclick="showPage('reports')">Reports</a></li>
+        <li><a href="#" onclick="showPage('plugins')">Plugins</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <section id="dashboard" class="page active">
+        <h1>Dashboard</h1>
+        <div class="stats">
+          <div class="card">Total Scans: 15</div>
+          <div class="card">Critical Issues: 5</div>
+          <div class="card">Medium Issues: 12</div>
+          <div class="card">Hosts Scanned: 8</div>
+        </div>
+        <h2>Recent Scans</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Scan ID</th>
+              <th>Status</th>
+              <th>Issues</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#001</td>
+              <td><span class="status success">Completed</span></td>
+              <td>3 Critical, 2 Medium</td>
+              <td>2025-09-10</td>
+              <td><button>View</button></td>
+            </tr>
+            <tr>
+              <td>#002</td>
+              <td><span class="status pending">Running</span></td>
+              <td>In Progress</td>
+              <td>2025-09-12</td>
+              <td><button>Stop</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="new-scan" class="page">
+        <h1>New Scan</h1>
+        <form>
+          <label>Target IP/Range</label>
+          <input type="text" placeholder="e.g. 192.168.1.1 or 192.168.1.0/24">
+
+          <label>Scan Profile</label>
+          <select>
+            <option>Safe Scan</option>
+            <option>Deep Scan</option>
+            <option>Custom</option>
+          </select>
+
+          <label>Authentication</label>
+          <input type="text" placeholder="Username">
+          <input type="password" placeholder="Password">
+
+          <label>Report Format</label>
+          <select>
+            <option>HTML</option>
+            <option>JSON</option>
+            <option>Email</option>
+          </select>
+
+          <button type="button" onclick="startScan()">Start Scan</button>
+        </form>
+      </section>
+
+      <section id="scan-results" class="page">
+        <h1>Scan Results</h1>
+        <p>Scan Progress:</p>
+        <div class="progress-bar">
+          <div id="progress" class="progress"></div>
+        </div>
+        <p id="progress-text">0%</p>
+      </section>
+
+      <section id="reports" class="page">
+        <h1>Reports</h1>
+        <p>No reports generated yet.</p>
+      </section>
+
+      <section id="plugins" class="page">
+        <h1>Plugins</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Plugin Name</th>
+              <th>Type</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SMB Vulnerability Scanner</td>
+              <td>SMB</td>
+              <td>Active</td>
+            </tr>
+            <tr>
+              <td>RDP Weakness Checker</td>
+              <td>RDP</td>
+              <td>Inactive</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
