@@ -50,14 +50,9 @@ We built **WinScan Pro**, an **agentless vulnerability scanner** that:
 
 ---
 
-## ⚠️ Disclaimer  
-This tool is for **educational & authorized security testing only**.  
-Do not scan systems you don’t own or have explicit permission for.  
-
 ---
 
-## 👨‍💻 Team  
-Made with ❤️ by **[Your Team Name]**- ✅ Consent & preference management dashboard  
+#Consent & preference management dashboard  
 - ✅ Secure data anonymization tools  
 - ✅ Real-time compliance monitoring & alerts  
 - ✅ Audit-ready reporting system  
@@ -68,7 +63,6 @@ Made with ❤️ by **[Your Team Name]**- ✅ Consent & preference management da
 - Pranjul
 - Ragav
 - Sanchita
-- Hackathon Submission Project  
 
-## 📄 License  
-This project is licensed under the MIT License – free to use and modify.  
+
+
