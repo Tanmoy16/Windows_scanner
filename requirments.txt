@@ -1,0 +1,5 @@
+
+python-nmap
+pywinrm
+impacket
+flask
