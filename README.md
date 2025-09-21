@@ -1,28 +1,58 @@
-# DataGuard – Privacy & Security Compliance Tool  
+# 🔒 WinScan Pro  
+**Agentless Windows Vulnerability Scanner with Web UI**  
 
-## 📌 Overview  
-DataGuard is a developer tool designed to help organizations ensure compliance with Indian data protection regulations such as the **Digital Personal Data Protection (DPDP) Act**, along with global standards like **GDPR** and **CCPA**. The tool simplifies data handling by providing automated compliance checks, data anonymization, user consent management, and audit-ready reporting.  
+---
 
-## 🚩 Problem Statement  
-In the digital era, businesses collect and process huge amounts of personal data. However, ensuring compliance with multiple data protection laws is often complex, time-consuming, and prone to errors. Non-compliance can result in **hefty fines, reputational damage, and security risks**.  
+## 🚩 Problem  
+Most security scanners require heavy agents, are expensive, or are hard to integrate.  
+Organizations need a **lightweight, agentless, and easy-to-use scanner** to find vulnerabilities in Windows systems quickly.  
+
+---
 
 ## 💡 Our Idea  
-We aim to create a **unified compliance and security assistant** that integrates into existing workflows, helping developers and companies securely handle sensitive data while staying compliant with Indian and global privacy laws.  
+We built **WinScan Pro**, an **agentless vulnerability scanner** that:  
+- Scans **Windows machines** over SMB/WinRM without installing agents.  
+- Detects **open ports, weak configurations, and common vulnerabilities**.  
+- Offers both **safe scans** (top 1000 ports) and **deep scans** (custom ports).  
+- Provides a **simple Web UI** for easy use + a **CLI** for automation.  
 
-## ⚙️ Tech Stack  
-- **Frontend**: React.js / Next.js (for Web UI)  
-- **Backend**: Node.js / Express  
-- **Database**: PostgreSQL / MongoDB (for secure data logging & audits)  
-- **Security**: AES Encryption, JWT Authentication  
-- **Compliance Features**: Data anonymization, consent tracking, audit reports  
-- **Deployment**: Docker, Kubernetes (scalable deployment)  
+---
 
-## 🌍 Impact  
-By providing a simple yet powerful compliance solution, DataGuard reduces legal risks, builds **user trust**, and encourages responsible data practices. It empowers developers to integrate compliance seamlessly into their applications and businesses to operate confidently in a global digital economy.  
+## 🛠️ Tech Stack  
+- **Backend**: Python (Flask)  
+- **Frontend**: HTML, CSS, JS  
+- **Scanner Core**: `socket`, `nmap` integration, custom plugins  
+- **Database/Storage**: SQLite (lightweight, local)  
+- **Reports**: JSON + HTML  
 
-## 🚀 Features  
-- ✅ Automated compliance checks for DPDP, GDPR, CCPA  
-- ✅ Consent & preference management dashboard  
+---
+
+## 🚀 How It Works  
+1. User enters **target IP / domain** in the Web UI or CLI.  
+2. Chooses **Safe Scan** (fast) or **Deep Scan** (detailed).  
+3. Scanner checks open ports, services, and common misconfigs.  
+4. Results are shown in the dashboard + exportable reports.  
+
+---
+
+## 📊 Impact  
+- Makes **cybersecurity accessible** for small teams & orgs.  
+- **Agentless design** = no setup pain, just scan instantly.  
+- Helps **prevent cyber attacks** by detecting issues early.  
+- Can integrate with compliance requirements (ISO 27001, Indian CERT-In, etc).  
+
+---
+
+## 🎯 Future Scope  
+- Add **CVE database integration** for known vulnerabilities.  
+- Role-based access control (RBAC) for team use.  
+- Cloud deployment support (scan multiple systems).  
+
+---
+
+---
+
+#Consent & preference management dashboard  
 - ✅ Secure data anonymization tools  
 - ✅ Real-time compliance monitoring & alerts  
 - ✅ Audit-ready reporting system  
@@ -33,7 +63,6 @@ By providing a simple yet powerful compliance solution, DataGuard reduces legal 
 - Pranjul
 - Ragav
 - Sanchita
-- Hackathon Submission Project  
 
-## 📄 License  
-This project is licensed under the MIT License – free to use and modify.  
+
+
