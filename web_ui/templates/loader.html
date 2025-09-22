@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="page-center-container">
+        <div class="logo-title">
+            <span class="logo-icon">W</span>
+            <span>WinScan Pro</span>
+        </div>
+        <div class="loader-text">loading...</div>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+    <script>
+        setTimeout(() => {
+            window.location.href = "{{ url_for('dashboard') }}";
+        }, 2000); // 2 second load time
+    </script>
+</body>
+</html>

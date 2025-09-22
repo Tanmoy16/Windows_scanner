@@ -1,31 +1,52 @@
 {% extends "base.html" %}
-
-{% block title %}New Scan - Windows Scanner{% endblock %}
-
+{% block title %}New Scan - WinScan Pro{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h1>New Scan</h1>
-    <p>Configure and launch a new vulnerability scan.</p>
+    <h1>New Vulnerability Scan</h1>
+    <p>Configure and launch a new Windows vulnerability scan</p>
 </div>
-
-<div class="panel">
-    <form action="{{ url_for('run_scan_route') }}" method="POST">
-        <div class="form-group">
-            <label for="targets">Target IPs (comma-separated)</label>
-            <input type="text" id="targets" name="targets" placeholder="e.g., 192.168.1.100" required>
+<form action="/run_scan" method="POST">
+    <div class="scan-config-grid">
+        <div class="panel">
+            <div class="panel-header"><h2>Scan Configuration</h2></div>
+            <div class="form-group">
+                <label for="targets">Target IP Addresses or Ranges</label>
+                <textarea id="targets" name="targets" rows="4" placeholder="Enter IP addresses, CIDR ranges, or IP ranges (one per line)"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="profile">Scan Profile</label>
+                <select id="profile" name="profile">
+                    <option value="safe">Safe Scan (Top 1000 ports)</option>
+                    <option value="deep">Deep Scan (Custom Ports)</option>
+                </select>
+            </div>
+             <div class="form-group">
+                <label>Authentication (Optional)</label>
+                <input type="text" name="username" placeholder="Username" style="margin-bottom: 0.5rem;">
+                <input type="password" name="password" placeholder="Password">
+                <small>Required for WinRM-based vulnerability checks</small>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="profile">Scan Profile</label>
-            <select id="profile" name="profile">
-                <option value="safe">Safe Scan (Common Ports)</option>
-                <option value="deep">Deep Scan (Custom Ports)</option>
-            </select>
+        <div class="panel">
+            <div class="panel-header"><h2>Vulnerability Plugins</h2></div>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" checked> SMB Anonymous Shares</label>
+                <label class="checkbox-item"><input type="checkbox" checked> SMBv1 Enabled</label>
+                <label class="checkbox-item"><input type="checkbox" checked> WinRM Hotfix Enumeration</label>
+                <label class="checkbox-item"><input type="checkbox"> Open RDP Access</label>
+                <label class="checkbox-item"><input type="checkbox"> Weak SMB Signing</label>
+            </div>
+            <div class="panel-header" style="margin-top: 2rem;"><h2>Report Options</h2></div>
+             <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox"> Generate HTML Report</label>
+                <label class="checkbox-item"><input type="checkbox" checked> Generate JSON Report</label>
+                <label class="checkbox-item"><input type="checkbox"> Email Results</label>
+            </div>
         </div>
-        <div class="form-group" id="ports-group" style="display: none;">
-            <label for="ports">Custom Ports</label>
-            <input type="text" id="ports" name="ports" placeholder="e.g., 80,443,5985">
-        </div>
-        <button type="submit" class="action-button">Launch Scan</button>
-    </form>
-</div>
+    </div>
+    <div class="action-buttons">
+        <button type="submit" class="btn btn-primary">Start Scan</button>
+        <button type="button" class="btn btn-secondary">Save Configuration</button>
+    </div>
+</form>
 {% endblock %}

@@ -1,36 +1,49 @@
 {% extends "base.html" %}
-
-{% block title %}Scan Result - Windows Scanner{% endblock %}
-
+{% block title %}Scan Results - WinScan Pro{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h1>Scan Result</h1>
-    <p>Target: <strong>{{ data.target }}</strong> | Ran on: {{ data.timestamp }}</p>
+    <h1>Scan Results</h1>
+    <p>Detailed vulnerability findings from your scans</p>
+</div>
+
+<div class="panel progress-panel">
+    <div class="progress-header">
+        <span>Scan SC-2024-001 - In Progress</span>
+        <span>Target: 192.168.56.0/24</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+    <div class="progress-header">
+        <span class="scan-status">Currently Scanning: 192.168.56.115 - SMB Enumeration</span>
+        <span class="scan-status">Progress: 15/24 hosts completed</span>
+    </div>
 </div>
 
 <div class="panel">
-    <table class="results-table">
+    <div class="panel-header"><h2>Scan SC-2024-001 - Completed</h2></div>
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="value">12</div>
+            <div class="label">Hosts Scanned</div>
+        </div>
+        <div class="summary-card critical">
+            <div class="value">8</div>
+            <div class="label">Critical Issues</div>
+        </div>
+        <div class="summary-card medium">
+            <div class="value">5</div>
+            <div class="label">Medium Issues</div>
+        </div>
+        <div class="summary-card low">
+            <div class="value">2</div>
+            <div class="label">Low Issues</div>
+        </div>
+    </div>
+    <table class="results-table" style="margin-top: 2rem;">
         <thead>
-            <tr>
-                <th>Host</th>
-                <th>Vulnerability</th>
-                <th>Severity</th>
-                <th>Status</th>
-            </tr>
+            <tr><th>Host</th><th>Vulnerability</th><th>Status</th><th>Severity</th><th>Plugin</th><th>Actions</th></tr>
         </thead>
         <tbody>
-            {% for result in data.results %}
-            <tr>
-                <td>{{ result.host }}</td>
-                <td>{{ result.vulnerability }}</td>
-                <td><span class="severity-badge severity-{{ result.severity.lower() }}">{{ result.severity }}</span></td>
-                <td><span class="status-badge status-{{ result.status.lower() }}">{{ result.status }}</span></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4">No vulnerabilities found for this target.</td>
-            </tr>
-            {% endfor %}
+            <tr><td>192.168.56.101</td><td>Anonymous SMB Access</td><td>FAIL</td><td>Critical</td><td>smb_anon.py</td><td><a href="#">Details</a></td></tr>
         </tbody>
     </table>
 </div>

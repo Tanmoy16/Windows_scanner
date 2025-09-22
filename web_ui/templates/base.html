@@ -3,28 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Windows Scanner{% endblock %}</title>
+    <title>{% block title %}WinScan Pro{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
     <div class="layout-wrapper">
         <nav class="sidebar">
-            <div class="sidebar-header">
-                SCANNER
+            <div>
+                <div class="sidebar-header">
+                    <div class="logo-title">
+                        <span class="logo-icon">W</span>
+                        <span>WinScan Pro</span>
+                    </div>
+                    <div class="sidebar-subtitle">Vulnerability Scanner</div>
+                </div>
+                <ul class="sidebar-nav">
+                    <div class="nav-category">Main</div>
+                    <li class="nav-item {% if request.path == url_for('dashboard') %}active{% endif %}">
+                        <a href="{{ url_for('dashboard') }}"><img src="{{ url_for('static', filename='images/dashboard.svg') }}" class="icon">Dashboard</a>
+                    </li>
+                    <li class="nav-item {% if request.path == url_for('new_scan') %}active{% endif %}">
+                        <a href="{{ url_for('new_scan') }}"><img src="{{ url_for('static', filename='images/new_scan.svg') }}" class="icon">New Scan</a>
+                    </li>
+                    <li class="nav-item {% if 'results' in request.path %}active{% endif %}">
+                         <a href="{{ url_for('results') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
+                    </li>
+                    <li class="nav-item {% if 'reports' in request.path %}active{% endif %}">
+                        <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Reports</a>
+                    </li>
+                </ul>
+                <ul class="sidebar-nav">
+                    <div class="nav-category">Settings</div>
+                    </ul>
             </div>
-            <ul class="sidebar-nav">
-                <li class="nav-item {% if request.path == url_for('dashboard') %}active{% endif %}">
-                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                </li>
-                <li class="nav-item {% if request.path == url_for('new_scan') %}active{% endif %}">
-                    <a href="{{ url_for('new_scan') }}">New Scan</a>
-                </li>
-                <li class="nav-item {% if 'report' in request.path %}active{% endif %}">
-                    <a href="{{ url_for('reports') }}">Reports</a>
-                </li>
-            </ul>
         </nav>
-
         <main class="main-content">
             {% block content %}{% endblock %}
         </main>

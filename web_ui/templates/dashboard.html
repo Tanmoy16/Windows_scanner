@@ -1,16 +1,37 @@
 {% extends "base.html" %}
-
-{% block title %}Dashboard - Windows Scanner{% endblock %}
-
+{% block title %}Dashboard - WinScan Pro{% endblock %}
 {% block content %}
 <div class="page-header">
     <h1>Dashboard</h1>
-    <p>Welcome to your agentless Windows vulnerability scanner.</p>
+    <p>Overview of your Windows vulnerability scanning activities</p>
 </div>
-
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="value">24</div>
+        <div class="label">Total Scans</div>
+    </div>
+    <div class="stat-card">
+        <div class="value">156</div>
+        <div class="label">Hosts Scanned</div>
+    </div>
+    <div class="stat-card critical">
+        <div class="value">8</div>
+        <div class="label">Critical Issues</div>
+    </div>
+    <div class="stat-card medium">
+        <div class="value">15</div>
+        <div class="label">Medium Risk</div>
+    </div>
+</div>
 <div class="panel">
-    <h2>Ready to Scan?</h2>
-    <p>Click "New Scan" in the sidebar to begin assessing your network's security posture.</p>
-    <a href="{{ url_for('new_scan') }}" class="action-button">Start a New Scan</a>
+    <div class="panel-header"><h2>Recent Scan Activity</h2></div>
+    <table class="results-table">
+        <thead>
+            <tr><th>Scan ID</th><th>Target Range</th><th>Status</th><th>Vulnerabilities</th><th>Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>SC-2024-001</td><td>192.168.56.0/24</td><td>Completed</td><td>8 Critical, 15 Medium</td><td>2025-09-22</td><td><a href="#">View</a></td></tr>
+        </tbody>
+    </table>
 </div>
 {% endblock %}

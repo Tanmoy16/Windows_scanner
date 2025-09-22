@@ -1,33 +1,29 @@
 {% extends "base.html" %}
-
-{% block title %}Scan Reports - Windows Scanner{% endblock %}
-
+{% block title %}Vulnerability Reports - WinScan Pro{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h1>Scan Reports</h1>
-    <p>Review results from previous scans.</p>
+    <h1>Vulnerability Reports</h1>
+    <p>Detailed analysis and recommendations for discovered vulnerabilities</p>
 </div>
-
 <div class="panel">
-    <table class="results-table">
-        <thead>
-            <tr>
-                <th>Report File</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for report in reports %}
-            <tr>
-                <td>{{ report }}</td>
-                <td><a href="{{ url_for('view_report', filename=report) }}" class="action-button" style="padding: 0.5rem 1rem; margin-top: 0;">View</a></td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="2">No reports found. Run a new scan to generate one.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="panel-header"><h2>Executive Summary - Scan SC-2024-001</h2></div>
+    <div class="report-list">
+        <div class="report-card">
+            <div class="report-header">
+                <span class="severity-badge severity-critical">Critical</span>
+                <h3 class="report-title">SMB Anonymous Access Detected</h3>
+            </div>
+            <p class="report-details">Host 192.168.56.101 allows anonymous access to SMB shares, potentially exposing sensitive data.</p>
+            <p class="report-recommendation"><b>Recommendation:</b> Disable anonymous SMB access by modifying registry settings or group policy. Ensure proper access controls are in place for all shared resources.</p>
+        </div>
+        <div class="report-card">
+            <div class="report-header">
+                <span class="severity-badge severity-medium">Medium</span>
+                <h3 class="report-title">Outdated Windows Security Updates</h3>
+            </div>
+            <p class="report-details">Multiple hosts are missing recent security patches, including KB5029244 and KB5028997.</p>
+            <p class="report-recommendation"><b>Recommendation:</b> Deploy the latest security updates via WSUS or manually. Prioritize critical and high-severity patches.</p>
+        </div>
+    </div>
 </div>
 {% endblock %}

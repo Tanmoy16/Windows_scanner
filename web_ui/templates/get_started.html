@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinScan Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="page-center-container">
+        <div class="logo-title">
+            <span class="logo-icon">W</span>
+            <span>WinScan Pro</span>
+        </div>
+        <button id="get-started-btn" class="start-button">Get Started</button>
+    </div>
+    <script>
+        document.getElementById('get-started-btn').addEventListener('click', () => {
+            window.location.href = "{{ url_for('loader') }}";
+        });
+    </script>
+</body>
+</html>
