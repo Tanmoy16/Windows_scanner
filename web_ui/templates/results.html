@@ -1,61 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan Results - Windows Scanner</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="dashboard-wrapper">
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h2>SCANNER</h2>
-            </div>
-            <ul class="sidebar-nav">
-                <li class="nav-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
-                <li class="nav-item"><a href="#">New Scan</a></li>
-                <li class="nav-item active"><a href="#">Scan Result</a></li>
-            </ul>
-        </nav>
+{% extends "base.html" %}
 
-        <main class="main-content">
-            <header class="main-header">
-                <h1>Scan Results</h1>
-                <p>Results for target: <strong>{{ target }}</strong></p>
-            </header>
+{% block title %}Scan Result - Windows Scanner{% endblock %}
 
-            <div class="results-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Host</th>
-                            <th>Vulnerability</th>
-                            <th>Severity</th>
-                            <th>Status</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for result in results %}
-                        <tr>
-                            <td>{{ result.host }}</td>
-                            <td>{{ result.vulnerability }}</td>
-                            <td><span class="severity-badge severity-{{ result.severity.lower() }}">{{ result.severity }}</span></td>
-                            <td><span class="status-badge status-{{ result.status.lower() }}">{{ result.status }}</span></td>
-                            <td class="details">{{ result.details }}</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="5" class="no-results">No vulnerabilities found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                 <a href="{{ url_for('index') }}" class="back-button">Run Another Scan</a>
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+{% block content %}
+<div class="page-header">
+    <h1>Scan Result</h1>
+    <p>Target: <strong>{{ data.target }}</strong> | Ran on: {{ data.timestamp }}</p>
+</div>
+
+<div class="panel">
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>Host</th>
+                <th>Vulnerability</th>
+                <th>Severity</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in data.results %}
+            <tr>
+                <td>{{ result.host }}</td>
+                <td>{{ result.vulnerability }}</td>
+                <td><span class="severity-badge severity-{{ result.severity.lower() }}">{{ result.severity }}</span></td>
+                <td><span class="status-badge status-{{ result.status.lower() }}">{{ result.status }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No vulnerabilities found for this target.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

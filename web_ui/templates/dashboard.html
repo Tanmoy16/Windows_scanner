@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Windows Scanner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Welcome to your agentless Windows vulnerability scanner.</p>
+</div>
+
+<div class="panel">
+    <h2>Ready to Scan?</h2>
+    <p>Click "New Scan" in the sidebar to begin assessing your network's security posture.</p>
+    <a href="{{ url_for('new_scan') }}" class="action-button">Start a New Scan</a>
+</div>
+{% endblock %}

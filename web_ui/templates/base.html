@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Windows Scanner{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                SCANNER
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item {% if request.path == url_for('dashboard') %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                </li>
+                <li class="nav-item {% if request.path == url_for('new_scan') %}active{% endif %}">
+                    <a href="{{ url_for('new_scan') }}">New Scan</a>
+                </li>
+                <li class="nav-item {% if 'report' in request.path %}active{% endif %}">
+                    <a href="{{ url_for('reports') }}">Reports</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -2,9 +2,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const profileSelect = document.getElementById('profile');
     if (profileSelect) {
-        profileSelect.addEventListener('change', function() {
+        // Function to toggle port visibility
+        const togglePorts = () => {
             const portsGroup = document.getElementById('ports-group');
-            portsGroup.style.display = this.value === 'deep' ? 'block' : 'none';
-        });
+            if (portsGroup) {
+                 portsGroup.style.display = profileSelect.value === 'deep' ? 'block' : 'none';
+            }
+        };
+        // Run on page load and on change
+        togglePorts();
+        profileSelect.addEventListener('change', togglePorts);
     }
 });

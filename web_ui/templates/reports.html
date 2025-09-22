@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Scan Reports - Windows Scanner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Scan Reports</h1>
+    <p>Review results from previous scans.</p>
+</div>
+
+<div class="panel">
+    <table class="results-table">
+        <thead>
+            <tr>
+                <th>Report File</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+            <tr>
+                <td>{{ report }}</td>
+                <td><a href="{{ url_for('view_report', filename=report) }}" class="action-button" style="padding: 0.5rem 1rem; margin-top: 0;">View</a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="2">No reports found. Run a new scan to generate one.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}New Scan - Windows Scanner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>New Scan</h1>
+    <p>Configure and launch a new vulnerability scan.</p>
+</div>
+
+<div class="panel">
+    <form action="{{ url_for('run_scan_route') }}" method="POST">
+        <div class="form-group">
+            <label for="targets">Target IPs (comma-separated)</label>
+            <input type="text" id="targets" name="targets" placeholder="e.g., 192.168.1.100" required>
+        </div>
+        <div class="form-group">
+            <label for="profile">Scan Profile</label>
+            <select id="profile" name="profile">
+                <option value="safe">Safe Scan (Common Ports)</option>
+                <option value="deep">Deep Scan (Custom Ports)</option>
+            </select>
+        </div>
+        <div class="form-group" id="ports-group" style="display: none;">
+            <label for="ports">Custom Ports</label>
+            <input type="text" id="ports" name="ports" placeholder="e.g., 80,443,5985">
+        </div>
+        <button type="submit" class="action-button">Launch Scan</button>
+    </form>
+</div>
+{% endblock %}
