@@ -25,9 +25,9 @@
                     <li class="nav-item {% if request.path == url_for('new_scan') %}active{% endif %}">
                         <a href="{{ url_for('new_scan') }}"><img src="{{ url_for('static', filename='images/new_scan.svg') }}" class="icon">New Scan</a>
                     </li>
-                    <li class="nav-item {% if 'results' in request.path %}active{% endif %}">
-                         <a href="{{ url_for('results') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
-                    </li>
+                    <li class="nav-item {% if 'report' in request.path %}active{% endif %}">
+    <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
+</li>
                     <li class="nav-item {% if 'reports' in request.path %}active{% endif %}">
                         <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Reports</a>
                     </li>
