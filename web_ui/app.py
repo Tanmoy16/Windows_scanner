@@ -19,15 +19,27 @@ os.makedirs(REPORTS_DIR, exist_ok=True)
 def get_all_scan_data():
     """Helper function to read and parse all report files."""
     all_reports = []
+    # Ensure we only try to read files that exist
+    if not os.path.exists(REPORTS_DIR):
+        return all_reports
+
     for filename in sorted(os.listdir(REPORTS_DIR), reverse=True):
         if filename.endswith(".json"):
+            report_path = os.path.join(REPORTS_DIR, filename)
+            # --- START OF FIX ---
+            # Check if the file is empty before trying to read it
+            if os.path.getsize(report_path) == 0:
+                print(f"Warning: Skipping empty report file {filename}")
+                continue # Skip to the next file
+            # --- END OF FIX ---
             try:
-                with open(os.path.join(REPORTS_DIR, filename), 'r') as f:
+                with open(report_path, 'r') as f:
                     data = json.load(f)
                     data['filename'] = filename # Add filename for linking
                     all_reports.append(data)
             except (json.JSONDecodeError, IOError) as e:
-                print(f"Could not read report {filename}: {e}")
+                # This will now catch corrupted JSON files and other read errors
+                print(f"Warning: Could not read or parse report {filename}: {e}")
     return all_reports
 
 @app.route('/')
@@ -59,6 +71,7 @@ def dashboard():
     recent_scans = all_reports[:5]
     
     return render_template('dashboard.html', stats=stats, recent_scans=recent_scans)
+
 
 @app.route('/new_scan')
 def new_scan():
