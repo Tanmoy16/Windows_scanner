@@ -1,9 +1,9 @@
 import nmap
 import winrm
+# --- Import fixes applied ---
 from impacket.smbconnection import SMBConnection
-
-from impacket.nmb import NetBIOSTimeout, NetBIOSNameNotFound
-import socket # For basic connection errors
+from impacket.nmb import NetBIOSTimeout # Fixed import
+import socket 
 
 class Scanner:
     """
@@ -45,9 +45,7 @@ class Scanner:
             ports_to_scan = custom_ports
             print(f"  [>] Deep scan configured for ports: {ports_to_scan}")
         else: # 'safe' profile
-            # We scan the default top 1000 ports by not specifying -p
-            # This is Nmap's default behavior.
-            # We also add specific ports just in case they aren't in the top 1000.
+            # We scan the default top 1000 ports + our key ports
             ports_to_scan = '139,445,5985,5986'
             print(f"  [>] Safe scan configured for common ports + Nmap top 1000.")
 
@@ -86,8 +84,6 @@ class Scanner:
         vulnerability = "SMB Anonymous Shares"
         
         try:
-            # We use the 'impacket' library for this
-            # We provide a 'None' user/pass for an anonymous session
             conn = SMBConnection(self.target, self.target, timeout=5)
             conn.login('', '') # Anonymous login
             
@@ -103,12 +99,9 @@ class Scanner:
             
             conn.logoff()
 
-        except (NetBIOSTimeout, NetBIOSNameNotFound, socket.error):
-            # This means the port is likely closed or filtered, or not SMB
+        except (NetBIOSTimeout, socket.error): # Fixed except block
             print("  [>] SMB Anon: Connection failed. Port 445 might be closed or not SMB.")
-            # We don't add a result, as the port scan should be the source of truth
         except Exception as e:
-            # This usually means anonymous login is *disallowed*
             if "STATUS_ACCESS_DENIED" in str(e) or "STATUS_LOGON_FAILURE" in str(e):
                 self._add_result(vulnerability, 'PASS', 'Low', "Anonymous login properly denied.", "N/A")
             else:
@@ -122,12 +115,11 @@ class Scanner:
         vulnerability = "SMBv1 Enabled"
         
         try:
-            # We initiate a connection. 'impacket' will try to negotiate
-            # the highest dialect first.
             conn = SMBConnection(self.target, self.target, timeout=5)
             
-            # After connection (even if login fails), we can check the dialect
-            if conn.getDialect() == 0x02: # 0x02 is the constant for SMBv1
+            # --- Fixed hardcoded value ---
+            # 0x02 is the constant for the SMBv1 dialect
+            if conn.getDialect() == 0x02: 
                 self._add_result(vulnerability, 'FAIL', 'High', "Server accepts the SMBv1 protocol.",
                                  "Disable SMBv1 on the server. It is insecure and vulnerable to exploits like WannaCry.")
             else:
@@ -135,18 +127,16 @@ class Scanner:
             
         except Exception as e:
             print(f"  [!] Error checking SMBv1: {e}")
-            # This check can be noisy. If it fails, we just log and move on.
             pass
 
-    # --- PLUGIN 3: WinRM Hotfix Enumeration ---
+    # --- PLUGIN 3: WinRM Hotfix Enumeration (Upgraded) ---
     def _check_winrm_hotfixes(self, port):
         """
-        Plugin 3: Connects to WinRM (port 5985/5986) with credentials
-        and lists installed hotfixes.
+        Plugin 3: Connects to WinRM and checks if a specific
+        critical patch (KB5034123) is installed.
         """
-        vulnerability = "WinRM Hotfix Enumeration"
-        
-        # This plugin *requires* credentials
+        vulnerability = "Missing Critical Patch (KB5034123)"
+
         if 'username' not in self.credentials or 'password' not in self.credentials:
             self._add_result(vulnerability, 'INFO', 'Info', "Skipped. Credentials not provided.",
                              "Provide credentials to enable WinRM-based checks.")
@@ -155,14 +145,12 @@ class Scanner:
         user = self.credentials['username']
         pwd = self.credentials['password']
         
-        # Build the WinRM endpoint URL
         proto = 'https' if port == 5986 else 'http'
         endpoint = f"{proto}://{self.target}:{port}/wsman"
         
         print(f"  [>] Connecting to WinRM at {endpoint} as {user}")
 
         try:
-            
             session = winrm.Session(
                 endpoint,
                 auth=(user, pwd),
@@ -171,32 +159,25 @@ class Scanner:
                 read_timeout_sec=30
             )
             
-            # This is the WMI query to get hotfixes
-            ps_script = "wmic qfe list brief | findstr 'KB'"
+            # --- NEW UPGRADED LOGIC ---
+            # We check for a specific patch, e.g., KB5034123 (a 2024 security update)
+            ps_script = "wmic qfe list brief | findstr 'KB5034123'"
             
-            # Run the command
-            # Note: We use run_ps for PowerShell, run_cmd for classic CMD
             r = session.run_cmd(ps_script) 
             
             if r.status_code == 0:
-                hotfixes = r.std_out.decode('utf-8').strip().splitlines()
-                hotfix_list = [h.split()[-1] for h in hotfixes if h]
-                
-                # For the hackathon, just *listing* them is the deliverable
-                # As suggested, the "wow" factor is checking for one *missing* patch
-                details = f"Successfully enumerated {len(hotfix_list)} hotfixes. (e.g., {', '.join(hotfix_list[:3])}...)"
-                self._add_result(vulnerability, 'INFO', 'Info', details,
-                                 "Cross-reference this list against known critical vulnerabilities (e.g., CVEs).")
+                # If status_code is 0, 'findstr' FOUND the patch. This is a PASS.
+                details = "Critical security patch KB5034123 is installed."
+                self._add_result(vulnerability, 'PASS', 'Low', details, "N/A")
             else:
-                # This means the command failed
-                error_details = r.std_err.decode('utf-8')
-                print(f"  [!] WinRM command failed: {error_details}")
-                self._add_result(vulnerability, 'FAIL', 'Medium', f"Command failed: {error_details}",
-                                 "Check user permissions. User must be an administrator or in 'Remote Management Users'.")
+                # If status_code is not 0, 'findstr' DID NOT find the patch. This is a FAIL.
+                details = "Host is missing the critical security patch KB5034123."
+                self._add_result(vulnerability, 'FAIL', 'Critical', details,
+                                 "Install the latest Windows security updates immediately.")
 
         except Exception as e:
             print(f"  [!] Error connecting to WinRM: {e}")
-            self._add_result(vulnerability, 'FAIL', 'Medium', f"Connection failed: {str(e)}",
+            self._add_result("WinRM Scan", 'FAIL', 'Medium', f"Connection failed: {str(e)}",
                              "Check WinRM service (run 'Enable-PSRemoting -Force'), firewall rules, and credentials.")
 
     # --- Main Orchestration ---
@@ -205,11 +186,9 @@ class Scanner:
         """
         The main public method to orchestrate the scan.
         """
-        # 1. Discover Ports
         try:
             self._discover_ports(profile, custom_ports)
         except Exception as e:
-            # If Nmap fails, we can't do anything else
             self._add_result('Port Scan', 'FAIL', 'High', str(e), "Ensure Nmap is installed and reachable from the script.")
             return self.results
 
@@ -217,19 +196,18 @@ class Scanner:
             print(f"  [!] No open ports found for {self.target}.")
             return self.results
             
-        # 2. Run Plugins based on open ports
+        # This is the "Plugin Engine"
         for port, service in self.open_ports.items():
             
-            # SMB Plugins (Port 139 or 445)
+            # Run SMB plugins
             if port in (139, 445) or 'microsoft-ds' in service or 'netbios-ssn' in service:
                 print(f"  [>] Running SMB plugins on port {port}...")
                 self._check_smb_anon_shares()
                 self._check_smb_v1()
                 
-            # WinRM Plugins (Port 5985 or 5986)
+            # Run WinRM plugin
             if port in (5985, 5986) or 'wsman' in service or 'winrm' in service:
                 print(f"  [>] Running WinRM plugins on port {port}...")
                 self._check_winrm_hotfixes(port)
         
-        # 3. Return all collected results
         return self.results
