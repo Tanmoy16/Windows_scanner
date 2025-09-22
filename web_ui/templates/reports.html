@@ -6,24 +6,20 @@
     <p>Detailed analysis and recommendations for discovered vulnerabilities</p>
 </div>
 <div class="panel">
-    <div class="panel-header"><h2>Executive Summary - Scan SC-2024-001</h2></div>
+    <div class="panel-header"><h2>Executive Summary - All Scans</h2></div>
     <div class="report-list">
+        {% for vuln in vulnerabilities %}
         <div class="report-card">
             <div class="report-header">
-                <span class="severity-badge severity-critical">Critical</span>
-                <h3 class="report-title">SMB Anonymous Access Detected</h3>
+                <span class="severity-badge severity-{{ vuln.severity.lower() }}">{{ vuln.severity }}</span>
+                <h3 class="report-title">{{ vuln.vulnerability }}</h3>
             </div>
-            <p class="report-details">Host 192.168.56.101 allows anonymous access to SMB shares, potentially exposing sensitive data.</p>
-            <p class="report-recommendation"><b>Recommendation:</b> Disable anonymous SMB access by modifying registry settings or group policy. Ensure proper access controls are in place for all shared resources.</p>
+            <p class="report-details">Detected on host: {{ vuln.host }}</p>
+            <p class="report-recommendation"><b>Recommendation:</b> Check the detailed scan report for remediation steps.</p>
         </div>
-        <div class="report-card">
-            <div class="report-header">
-                <span class="severity-badge severity-medium">Medium</span>
-                <h3 class="report-title">Outdated Windows Security Updates</h3>
-            </div>
-            <p class="report-details">Multiple hosts are missing recent security patches, including KB5029244 and KB5028997.</p>
-            <p class="report-recommendation"><b>Recommendation:</b> Deploy the latest security updates via WSUS or manually. Prioritize critical and high-severity patches.</p>
-        </div>
+        {% else %}
+        <p style="text-align: center; color: var(--text-muted);">No critical or medium vulnerabilities found across all scans.</p>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

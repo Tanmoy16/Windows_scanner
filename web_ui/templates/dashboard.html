@@ -7,19 +7,19 @@
 </div>
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="value">24</div>
+        <div class="value">{{ stats.total_scans }}</div>
         <div class="label">Total Scans</div>
     </div>
     <div class="stat-card">
-        <div class="value">156</div>
+        <div class="value">{{ stats.hosts_scanned }}</div>
         <div class="label">Hosts Scanned</div>
     </div>
     <div class="stat-card critical">
-        <div class="value">8</div>
+        <div class="value">{{ stats.critical_issues }}</div>
         <div class="label">Critical Issues</div>
     </div>
     <div class="stat-card medium">
-        <div class="value">15</div>
+        <div class="value">{{ stats.medium_issues }}</div>
         <div class="label">Medium Risk</div>
     </div>
 </div>
@@ -27,10 +27,23 @@
     <div class="panel-header"><h2>Recent Scan Activity</h2></div>
     <table class="results-table">
         <thead>
-            <tr><th>Scan ID</th><th>Target Range</th><th>Status</th><th>Vulnerabilities</th><th>Date</th><th>Actions</th></tr>
+            <tr><th>Scan ID</th><th>Target</th><th>Status</th><th>Vulnerabilities</th><th>Date</th><th>Actions</th></tr>
         </thead>
         <tbody>
-            <tr><td>SC-2024-001</td><td>192.168.56.0/24</td><td>Completed</td><td>8 Critical, 15 Medium</td><td>2025-09-22</td><td><a href="#">View</a></td></tr>
+            {% for scan in recent_scans %}
+            <tr>
+                <td>{{ scan.scan_id }}</td>
+                <td>{{ scan.target }}</td>
+                <td>Completed</td>
+                <td>{{ scan.summary.critical }} Critical, {{ scan.summary.medium }} Medium</td>
+                <td>{{ scan.timestamp }}</td>
+                <td><a href="{{ url_for('view_report', filename=scan.filename) }}">View</a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted);">No scans have been run yet.</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
