@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="loader-page">
+    <div class="loader-container">
+        <div class="loader-text">Initializing Security Scan Engine...</div>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+    </div>
+    <script>
+        setTimeout(() => {
+            window.location.href = "{{ url_for('index') }}";
+        }, 3000); // Simulate a 3-second load time
+    </script>
+</body>
+</html>

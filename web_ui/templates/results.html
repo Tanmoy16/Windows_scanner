@@ -3,58 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scan Results</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Scan Results - Windows Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Scan Results</h1>
-            <p>Scan completed for target(s): <strong>{{ target }}</strong></p>
-        </header>
+    <div class="dashboard-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>SCANNER</h2>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+                <li class="nav-item"><a href="#">New Scan</a></li>
+                <li class="nav-item active"><a href="#">Scan Result</a></li>
+            </ul>
+        </nav>
 
-        <main>
-            <section id="results-section">
-                {% for result in results %}
-                <div class="result-card">
-                    <div class="result-header">
-                        <span class="host">{{ result.host }}</span>
-                        <span class="vulnerability">{{ result.vulnerability }}</span>
-                        <span class="severity-badge severity-{{ result.severity.lower() }}">{{ result.severity }}</span>
-                        <span class="status-badge status-{{ result.status.lower() }}">{{ result.status }}</span>
-                    </div>
-                    <div class="result-details">
-                        <div class="result-details-content">
-                            <strong>Details</strong>
-                            <p>{{ result.details }}</p>
-                            <strong>Recommendation</strong>
-                            <p>{{ result.recommendation }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                    <p class="no-results">No vulnerabilities found or the host may be down.</p>
-                {% endfor %}
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Scan Results</h1>
+                <p>Results for target: <strong>{{ target }}</strong></p>
+            </header>
 
-                <a href="/" class="back-button">Run New Scan</a>
-            </section>
+            <div class="results-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Host</th>
+                            <th>Vulnerability</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr>
+                            <td>{{ result.host }}</td>
+                            <td>{{ result.vulnerability }}</td>
+                            <td><span class="severity-badge severity-{{ result.severity.lower() }}">{{ result.severity }}</span></td>
+                            <td><span class="status-badge status-{{ result.status.lower() }}">{{ result.status }}</span></td>
+                            <td class="details">{{ result.details }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="no-results">No vulnerabilities found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                 <a href="{{ url_for('index') }}" class="back-button">Run Another Scan</a>
+            </div>
         </main>
     </div>
-
-    <script>
-        document.querySelectorAll('.result-header').forEach(header => {
-            header.addEventListener('click', () => {
-                const details = header.nextElementSibling;
-                if (details.style.maxHeight) {
-                    details.style.maxHeight = null;
-                } else {
-                    details.style.maxHeight = details.scrollHeight + 'px';
-                }
-            });
-        });
-    </script>
 </body>
 </html>

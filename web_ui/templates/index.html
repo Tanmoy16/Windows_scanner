@@ -3,61 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows Vulnerability Scanner</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Dashboard - Windows Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Agentless Windows Vulnerability Scanner</h1>
-            <p>Enter target details below to begin a scan.</p>
-        </header>
+    <div class="dashboard-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>SCANNER</h2>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item active"><a href="{{ url_for('index') }}">Dashboard</a></li>
+                <li class="nav-item"><a href="#">New Scan</a></li>
+                <li class="nav-item"><a href="#">Scan Result</a></li>
+            </ul>
+        </nav>
 
-        <main>
-            <form id="scan-form" action="/scan" method="POST">
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="targets">Target IPs (comma-separated)</label>
-                        <input type="text" id="targets" name="targets" placeholder="e.g., 192.168.1.10" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="profile">Scan Profile</label>
-                        <select id="profile" name="profile">
-                            <option value="safe">Safe Scan</option>
-                            <option value="deep">Deep Scan</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="ports-group" style="display: none;">
+        <main class="main-content">
+            <header class="main-header">
+                <h1>New Scan</h1>
+                <p>Start a new vulnerability scan.</p>
+            </header>
+
+            <form class="scan-form" action="/scan" method="POST">
+                <div class="form-group">
+                    <label for="targets">Target IP</label>
+                    <input type="text" id="targets" name="targets" placeholder="Enter target IP e.g., 192.168.1.100" required>
+                </div>
+                <div class="form-group">
+                    <label for="profile">Scan Profile</label>
+                    <select id="profile" name="profile">
+                        <option value="safe">Safe Scan</option>
+                        <option value="deep">Deep Scan</option>
+                    </select>
+                </div>
+                 <div class="form-group" id="ports-group" style="display: none;">
                         <label for="ports">Custom Ports</label>
                         <input type="text" id="ports" name="ports" placeholder="e.g., 80,443,5985">
                     </div>
-                </div>
-
-                <div class="form-section credentials-section">
-                    <h3>Credentials (Optional)</h3>
-                    <div class="form-group">
-                        <label for="user">Username</label>
-                        <input type="text" id="user" name="user" placeholder="admin">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="••••••••">
-                    </div>
-                </div>
-                
-                <button type="submit" id="scan-button">Start Scan</button>
+                <button type="submit" class="scan-button">Start Scan</button>
             </form>
         </main>
     </div>
 
-    <script>
-        document.getElementById('profile').addEventListener('change', function() {
-            var portsGroup = document.getElementById('ports-group');
-            portsGroup.style.display = this.value === 'deep' ? 'block' : 'none';
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

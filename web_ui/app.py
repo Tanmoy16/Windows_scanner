@@ -1,40 +1,42 @@
 # web_ui/app.py
-
 import sys
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 
-# This is a crucial step to make the 'scanner' module importable
+# Add the root directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from scanner.integration import run_scan
 
 app = Flask(__name__)
 
 @app.route('/')
+def get_started():
+    """Renders the initial 'Get Started' page."""
+    return render_template('get_started.html')
+
+@app.route('/loader')
+def loader():
+    """Renders the loading animation page."""
+    return render_template('loader.html')
+
+@app.route('/dashboard')
 def index():
-    """Renders the main homepage with the scan form."""
+    """Renders the main dashboard page."""
     return render_template('index.html')
 
 @app.route('/scan', methods=['POST'])
 def scan():
-    """Handles the form submission, runs the scan, and displays results."""
-    # Get data directly from the submitted form
+    """Handles the form submission and displays results."""
     targets = request.form.get('targets')
     profile = request.form.get('profile')
     custom_ports = request.form.get('ports')
-    username = request.form.get('user')
-    password = request.form.get('password')
-
-    # Run the scanner function
+    
     results = run_scan(
         targets=targets,
         profile=profile,
-        custom_ports=custom_ports,
-        username=username,
-        password=password
+        custom_ports=custom_ports
     )
-
-    # Render the results page, passing the results data to the template
+    
     return render_template('results.html', results=results, target=targets)
 
 if __name__ == '__main__':
