@@ -179,6 +179,49 @@ class Scanner:
             print(f"  [!] Error connecting to WinRM: {e}")
             self._add_result("WinRM Scan", 'FAIL', 'Medium', f"Connection failed: {str(e)}",
                              "Check WinRM service (run 'Enable-PSRemoting -Force'), firewall rules, and credentials.")
+    # --- PLUGIN 4: Open RDP Access ---
+    def _check_rdp_open(self):
+        """
+        Plugin 4: Checks if the RDP port (3389) is open.
+        The 'run' engine only calls this if the port is found.
+        """
+        self._add_result(
+            vulnerability="Open RDP Access",
+            status='FAIL',
+            severity='High',
+            details="Port 3389 (Remote Desktop) is open to the network.",
+            recommendation="Ensure RDP is not exposed to the internet. Restrict access to specific, trusted IPs or require a VPN."
+        )
+
+    # --- PLUGIN 5: Weak SMB Signing ---
+    def _check_smb_signing(self):
+        """
+        Plugin 5: Checks if the SMB server enforces message signing.
+        """
+        vulnerability = "SMB Signing Disabled"
+        try:
+            # This check just negotiates, it doesn't need to log in
+            conn = SMBConnection(self.target, self.target, timeout=5)
+
+            if not conn.isSigningRequired():
+                self._add_result(
+                    vulnerability=vulnerability,
+                    status='FAIL',
+                    severity='Medium',
+                    details="The SMB server does not require message signing, making it vulnerable to man-in-the-middle attacks.",
+                    recommendation="Enable 'RequireSecuritySignature' in the server's security policy."
+                )
+            else:
+                self._add_result(
+                    vulnerability=vulnerability,
+                    status='PASS',
+                    severity='Low',
+                    details="SMB message signing is correctly enforced.",
+                    recommendation="N/A"
+                )
+            # We don't need to logoff() since we didn't login()
+        except Exception as e:
+            print(f"  [!] Error checking SMB signing: {e}")
 
     # --- Main Orchestration ---
     
@@ -195,19 +238,25 @@ class Scanner:
         if not self.open_ports:
             print(f"  [!] No open ports found for {self.target}.")
             return self.results
-            
+
         # This is the "Plugin Engine"
         for port, service in self.open_ports.items():
-            
+
             # Run SMB plugins
             if port in (139, 445) or 'microsoft-ds' in service or 'netbios-ssn' in service:
                 print(f"  [>] Running SMB plugins on port {port}...")
                 self._check_smb_anon_shares()
                 self._check_smb_v1()
-                
+                self._check_smb_signing() # <-- NEWLY ADDED
+
             # Run WinRM plugin
             if port in (5985, 5986) or 'wsman' in service or 'winrm' in service:
                 print(f"  [>] Running WinRM plugins on port {port}...")
                 self._check_winrm_hotfixes(port)
-        
+
+            # Run RDP plugin
+            if port == 3389 or 'ms-wbt-server' in service: # <-- NEWLY ADDED
+                print(f"  [>] Running RDP plugins on port {port}...")
+                self._check_rdp_open() # <-- NEWLY ADDED
+
         return self.results
