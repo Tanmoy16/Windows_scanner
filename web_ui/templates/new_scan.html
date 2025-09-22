@@ -5,7 +5,7 @@
     <h1>New Vulnerability Scan</h1>
     <p>Configure and launch a new Windows vulnerability scan</p>
 </div>
-<form action="/run_scan" method="POST">
+<form action="{{ url_for('run_scan_route') }}" method="POST">
     <div class="scan-config-grid">
         <div class="panel">
             <div class="panel-header"><h2>Scan Configuration</h2></div>
@@ -17,10 +17,18 @@
                 <label for="profile">Scan Profile</label>
                 <select id="profile" name="profile">
                     <option value="safe">Safe Scan (Top 1000 ports)</option>
-                    <option value="deep">Deep Scan (Custom Ports)</option>
+                    <option value="deep">Deep Scan (Custom Port Range)</option>
                 </select>
             </div>
-             <div class="form-group">
+            <div class="form-group" id="ports-group" style="display: none;">
+                <label>Custom Port Range</label>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <input type="number" id="start_port" name="start_port" placeholder="Start Port" min="1" max="65535">
+                    <span>-</span>
+                    <input type="number" id="end_port" name="end_port" placeholder="End Port" min="1" max="65535">
+                </div>
+            </div>
+            <div class="form-group">
                 <label>Authentication (Optional)</label>
                 <input type="text" name="username" placeholder="Username" style="margin-bottom: 0.5rem;">
                 <input type="password" name="password" placeholder="Password">

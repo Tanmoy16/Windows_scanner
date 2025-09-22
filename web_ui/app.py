@@ -67,7 +67,22 @@ def new_scan():
 
 @app.route('/run_scan', methods=['POST'])
 def run_scan_route():
+    profile = request.form.get('profile')
+    custom_ports = None
+
+    # --- START OF CHANGE: Process port range ---
+    if profile == 'deep':
+        start_port = request.form.get('start_port')
+        end_port = request.form.get('end_port')
+        if start_port and end_port:
+            # Format the port range as a string like "1-1024"
+            custom_ports = f"{start_port}-{end_port}"
+    # --- END OF CHANGE ---
+
     # --- Creating a FAKE report for demonstration ---
+    # In production, you would pass `custom_ports` to your actual scanner
+    # results = run_scan(..., custom_ports=custom_ports)
+    
     fake_results = [
         {"host": "192.168.1.101", "vulnerability": "SMB Anonymous Access", "status": "FAIL", "severity": "Critical", "plugin": "smb_anon.py"},
         {"host": "192.168.1.105", "vulnerability": "Outdated Windows Updates", "status": "FAIL", "severity": "Medium", "plugin": "win_updates.py"},
