@@ -1,29 +1,178 @@
-/* Add these new styles to your existing style.css */
-
-.back-button {
-    display: block;
-    width: 200px;
-    margin: 2rem auto 0;
-    text-align: center;
-    padding: 0.7rem;
-    background-color: var(--secondary-color);
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
+/* Simple reset and base styling */
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
 }
 
-.back-button:hover {
-    background-color: var(--accent-color);
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+h1, h3 {
+    color: #2c3e50;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
+}
+
+/* Form styling from your index.html */
+.scan-form {
+    display: grid;
+    grid-gap: 20px;
+}
+.form-section {
+    padding: 10px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+.credentials-section {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+}
+label {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+input[type="text"], input[type="password"], select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: inherit;
+}
+.radio-group {
+    line-height: 1.8;
+}
+
+/* Button styling */
+.button-primary, .back-button {
+    display: inline-block;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    width: 200px;
+    margin: 1rem auto 0;
+}
+.button-primary {
+    background-color: #3498db;
     color: white;
 }
+.button-primary:hover {
+    background-color: #2980b9;
+}
+.back-button {
+    background-color: #ecf0f1;
+    color: #333;
+}
+.back-button:hover {
+    background-color: #bdc3c7;
+}
+
+/* Dashboard styles */
+.dashboard {
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.dashboard h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+.summary-boxes {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+}
+.box {
+    padding: 15px 25px;
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+}
+.box strong {
+    display: block;
+    font-size: 2.5em;
+    font-weight: 600;
+}
+.box span {
+    font-size: 1.1em;
+}
+
+/* Results Card styles from your HTML */
+.result-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.result-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+.result-header:hover {
+    background-color: #f1f1f1;
+}
+.result-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+.result-details-content {
+    padding: 1rem;
+    border-top: 1px solid #eee;
+}
+.result-details-content p {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+.host { font-weight: 600; margin-right: 1rem; }
+.vulnerability { font-weight: 500; margin-right: auto; }
+.severity-badge, .status-badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    color: white;
+}
+.status-fail { background-color: #e74c3c; }
+.status-pass { background-color: #2ecc71; }
+.status-info { background-color: #3498db; }
+
+.severity-critical { background-color: #c0392b; }
+.severity-high { background-color: #e74c3c; }
+.severity-medium { background-color: #f39c12; }
+.severity-low { background-color: #3498db; }
+.severity-info { background-color: #95a5a6; }
+.severity-unknown { background-color: #7f8c8d; }
 
 .no-results {
     text-align: center;
-    color: var(--text-muted);
     padding: 2rem;
-    background-color: var(--secondary-color);
+    background-color: #f9f9f9;
     border-radius: 5px;
 }

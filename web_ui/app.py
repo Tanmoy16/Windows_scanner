@@ -8,7 +8,9 @@ from flask import Flask, render_template, request
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from scanner.integration import run_scan
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder='static',
+            template_folder='templates')
 
 @app.route('/')
 def index():
