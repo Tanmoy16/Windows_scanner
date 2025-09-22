@@ -26,15 +26,15 @@
                         <a href="{{ url_for('new_scan') }}"><img src="{{ url_for('static', filename='images/new_scan.svg') }}" class="icon">New Scan</a>
                     </li>
                     <li class="nav-item {% if 'report' in request.path %}active{% endif %}">
-    <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
-</li>
-                    <li class="nav-item {% if 'reports' in request.path %}active{% endif %}">
+                         <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
+                    </li>
+                    <li class="nav-item {% if request.path == url_for('reports') %}active{% endif %}">
                         <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Reports</a>
                     </li>
                 </ul>
                 <ul class="sidebar-nav">
                     <div class="nav-category">Settings</div>
-                    </ul>
+                </ul>
             </div>
         </nav>
         <main class="main-content">
