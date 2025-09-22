@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Vulnerability Scanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Agentless Windows Vulnerability Scanner</h1>
+            <p>Enter target details below to begin a scan.</p>
+        </header>
+
+        <main>
+            <form id="scan-form" action="/scan" method="POST">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="targets">Target IPs (comma-separated)</label>
+                        <input type="text" id="targets" name="targets" placeholder="e.g., 192.168.1.10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile">Scan Profile</label>
+                        <select id="profile" name="profile">
+                            <option value="safe">Safe Scan</option>
+                            <option value="deep">Deep Scan</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="ports-group" style="display: none;">
+                        <label for="ports">Custom Ports</label>
+                        <input type="text" id="ports" name="ports" placeholder="e.g., 80,443,5985">
+                    </div>
+                </div>
+
+                <div class="form-section credentials-section">
+                    <h3>Credentials (Optional)</h3>
+                    <div class="form-group">
+                        <label for="user">Username</label>
+                        <input type="text" id="user" name="user" placeholder="admin">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••">
+                    </div>
+                </div>
+                
+                <button type="submit" id="scan-button">Start Scan</button>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('profile').addEventListener('change', function() {
+            var portsGroup = document.getElementById('ports-group');
+            portsGroup.style.display = this.value === 'deep' ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>
