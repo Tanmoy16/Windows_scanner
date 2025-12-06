@@ -1,0 +1,46 @@
+{
+    "scan_id": "SC-2025-10-07-01-39-31",
+    "target": " 10.233.174.245",
+    "timestamp": "2025-10-07 01:39:31",
+    "summary": {
+        "hosts_scanned": 1,
+        "critical": 0,
+        "high": 0,
+        "medium": 2,
+        "low": 2
+    },
+    "results": [
+        {
+            "host": "10.233.174.245",
+            "vulnerability": "SMBv1 Enabled",
+            "status": "PASS",
+            "severity": "Low",
+            "details": "Server negotiated a modern dialect: 768",
+            "recommendation": "N/A"
+        },
+        {
+            "host": "10.233.174.245",
+            "vulnerability": "SMB Signing Disabled",
+            "status": "FAIL",
+            "severity": "Medium",
+            "details": "The SMB server does not require message signing, making it vulnerable to man-in-the-middle attacks.",
+            "recommendation": "Enable 'RequireSecuritySignature' in the server's security policy."
+        },
+        {
+            "host": "10.233.174.245",
+            "vulnerability": "SMBv1 Enabled",
+            "status": "PASS",
+            "severity": "Low",
+            "details": "Server negotiated a modern dialect: 768",
+            "recommendation": "N/A"
+        },
+        {
+            "host": "10.233.174.245",
+            "vulnerability": "SMB Signing Disabled",
+            "status": "FAIL",
+            "severity": "Medium",
+            "details": "The SMB server does not require message signing, making it vulnerable to man-in-the-middle attacks.",
+            "recommendation": "Enable 'RequireSecuritySignature' in the server's security policy."
+        }
+    ]
+}
