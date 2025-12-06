@@ -1,0 +1,7 @@
+{
+    "smb_anon": true,
+    "smb_v1": true,
+    "winrm_hotfix": true,
+    "rdp_open": false,
+    "smb_signing": false
+}

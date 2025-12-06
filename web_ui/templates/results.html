@@ -1,18 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Scan Results - WinScan Pro{% endblock %}
 {% block content %}
-<div class="page-header">
-    <h1>Scan Results</h1>
-    <p>Detailed vulnerability findings for Scan ID: <strong>{{ data.scan_id }}</strong></p>
+<div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1>Scan Results</h1>
+        <p>Detailed vulnerability findings for Scan ID: <strong>{{ data.scan_id }}</strong></p>
+    </div>
+    {% if report_id %}
+    <a href="{{ url_for('download_report', id=report_id) }}" class="btn btn-primary" style="text-decoration: none;">
+        Download Report
+    </a>
+    {% endif %}
 </div>
 
 <div class="panel">
     <div class="panel-header"><h2>Summary</h2></div>
     <div class="summary-cards">
-        <div class="summary-card">
-            <div class="value">{{ data.summary.hosts_scanned }}</div>
-            <div class="label">Hosts Scanned</div>
-        </div>
         <div class="summary-card critical">
             <div class="value">{{ data.summary.critical }}</div>
             <div class="label">Critical Issues</div>
@@ -21,15 +24,11 @@
             <div class="value">{{ data.summary.medium }}</div>
             <div class="label">Medium Issues</div>
         </div>
-        <div class="summary-card low">
-            <div class="value">{{ data.summary.low }}</div>
-            <div class="label">Low Issues</div>
-        </div>
     </div>
     <div class="panel-header" style="margin-top: 2rem;"><h2>Details</h2></div>
     <table class="results-table">
         <thead>
-            <tr><th>Host</th><th>Vulnerability</th><th>Status</th><th>Severity</th><th>Plugin</th></tr>
+            <tr><th>Host</th><th>Vulnerability</th><th>Status</th><th>Severity</th><th>Details</th></tr>
         </thead>
         <tbody>
             {% for result in data.results %}
@@ -38,7 +37,7 @@
                 <td>{{ result.vulnerability }}</td>
                 <td><span class="status-badge status-{{ result.status.lower() }}">{{ result.status }}</span></td>
                 <td><span class="severity-badge severity-{{ result.severity.lower() }}">{{ result.severity }}</span></td>
-                <td>{{ result.plugin }}</td>
+                <td style="font-size: 0.9rem; color: var(--text-muted);">{{ result.details }}</td>
             </tr>
             {% else %}
             <tr>

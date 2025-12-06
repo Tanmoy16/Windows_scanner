@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Login - WinScan Pro{% endblock %}
+{% block content %}
+<div class="page-center-container" style="height: 100vh; background: radial-gradient(circle at center, #1c2128 0%, #0f1115 100%);">
+    
+    <div class="panel" style="width: 100%; max-width: 420px; padding: 2.5rem; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+        
+        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; text-align: center;">
+            <div class="logo-icon" style="width: 60px; height: 60px; font-size: 2rem; margin-bottom: 1rem;">W</div>
+            <h2 style="margin: 0; font-size: 1.8rem; color: white;">Welcome Back</h2>
+            <p style="color: var(--text-muted); margin-top: 0.5rem;">Sign in to access your dashboard</p>
+        </div>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div style="background: rgba(248, 81, 73, 0.1); border: 1px solid #f85149; color: #f85149; padding: 0.8rem; border-radius: 6px; margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem;">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Enter your password">
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 1rem;">Login</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">New to WinScan Pro?</p>
+            <a href="{{ url_for('register') }}" class="btn" style="display: block; width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-main); text-decoration: none; text-align: center;">
+                Create an Account
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

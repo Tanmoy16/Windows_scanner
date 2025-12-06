@@ -35,26 +35,13 @@
                 <small>Required for WinRM-based vulnerability checks</small>
             </div>
         </div>
-        <div class="panel">
-            <div class="panel-header"><h2>Vulnerability Plugins</h2></div>
-            <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" checked> SMB Anonymous Shares</label>
-                <label class="checkbox-item"><input type="checkbox" checked> SMBv1 Enabled</label>
-                <label class="checkbox-item"><input type="checkbox" checked> WinRM Hotfix Enumeration</label>
-                <label class="checkbox-item"><input type="checkbox"> Open RDP Access</label>
-                <label class="checkbox-item"><input type="checkbox"> Weak SMB Signing</label>
-            </div>
-            <div class="panel-header" style="margin-top: 2rem;"><h2>Report Options</h2></div>
-             <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox"> Generate HTML Report</label>
-                <label class="checkbox-item"><input type="checkbox" checked> Generate JSON Report</label>
-                <label class="checkbox-item"><input type="checkbox"> Email Results</label>
-            </div>
+    
+            
         </div>
     </div>
     <div class="action-buttons">
         <button type="submit" class="btn btn-primary">Start Scan</button>
-        <button type="button" class="btn btn-secondary">Save Configuration</button>
+        
     </div>
 </form>
 {% endblock %}

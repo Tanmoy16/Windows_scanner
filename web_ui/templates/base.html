@@ -1,43 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}WinScan Pro{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WinScan Pro</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+  </head>
+  <body>
     <div class="layout-wrapper">
+        {% if current_user.is_authenticated %}
         <nav class="sidebar">
-            <div>
-                <div class="sidebar-header">
-                    <div class="logo-title">
-                        <span class="logo-icon">W</span>
-                        <span>WinScan Pro</span>
-                    </div>
-                    <div class="sidebar-subtitle">Vulnerability Scanner</div>
-                </div>
-                <ul class="sidebar-nav">
-                    <div class="nav-category">Main</div>
-                    <li class="nav-item {% if request.path == url_for('dashboard') %}active{% endif %}">
-                        <a href="{{ url_for('dashboard') }}"><img src="{{ url_for('static', filename='images/dashboard.svg') }}" class="icon">Dashboard</a>
-                    </li>
-                    <li class="nav-item {% if request.path == url_for('new_scan') %}active{% endif %}">
-                        <a href="{{ url_for('new_scan') }}"><img src="{{ url_for('static', filename='images/new_scan.svg') }}" class="icon">New Scan</a>
-                    </li>
-                    <li class="nav-item {% if 'report' in request.path %}active{% endif %}">
-                         <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
-                    </li>
-                    <li class="nav-item {% if request.path == url_for('reports') %}active{% endif %}">
-                        <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='web_ui/static/images/settings.svg') }}" class="icon">Reports</a>
-                    </li>
-                </ul>
-                <ul class="sidebar-nav">
-                    <div class="nav-category">Settings</div>
-                </ul>
+            <div class="sidebar-header">
+                <div class="logo-icon">W</div>
+                <div class="sidebar-title">WinScan Pro</div>
             </div>
+            <ul class="sidebar-nav">
+                <div class="nav-category">Main</div>
+                <li class="nav-item {% if request.path == url_for('dashboard') %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}"><img src="{{ url_for('static', filename='images/dashboard.svg') }}" class="icon">Dashboard</a>
+                </li>
+                <li class="nav-item {% if request.path == url_for('new_scan') %}active{% endif %}">
+                    <a href="{{ url_for('new_scan') }}"><img src="{{ url_for('static', filename='images/new_scan.svg') }}" class="icon">New Scan</a>
+                </li>
+                <li class="nav-item {% if 'report' in request.path and request.path != url_for('reports') %}active{% endif %}">
+                     <a href="#"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
+                </li>
+                <li class="nav-item {% if request.path == url_for('reports') %}active{% endif %}">
+                    <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/settings.svg') }}" class="icon">Reports</a>
+                </li>
+            </ul>
+            <ul class="sidebar-nav">
+                <div class="nav-category">Settings</div>
+                <li class="nav-item {% if request.path == url_for('settings') %}active{% endif %}">
+                    <a href="{{ url_for('settings') }}">
+                        <img src="{{ url_for('static', filename='images/settings.svg') }}" class="icon">Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('logout') }}" style="color: var(--critical);">
+                        <span class="icon" style="background: var(--critical); border-radius: 50%; width: 8px; height: 8px; display: inline-block;"></span>
+                        Logout
+                    </a>
+                </li>
+            </ul>
         </nav>
-        <main class="main-content">
+        {% endif %}
+
+        <main class="main-content" style="{% if not current_user.is_authenticated %}margin: 0; padding: 0; width: 100%;{% endif %}">
             {% block content %}{% endblock %}
         </main>
     </div>

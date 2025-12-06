@@ -7,41 +7,60 @@
 </div>
 <div class="stats-grid">
     <div class="stat-card">
-        <div class="value">{{ stats.total_scans }}</div>
         <div class="label">Total Scans</div>
+        <div class="value">{{ stats.total_scans }}</div>
     </div>
     <div class="stat-card">
-        <div class="value">{{ stats.hosts_scanned }}</div>
         <div class="label">Hosts Scanned</div>
+        <div class="value">{{ stats.hosts_scanned }}</div>
     </div>
     <div class="stat-card critical">
-        <div class="value">{{ stats.critical_issues }}</div>
         <div class="label">Critical Issues</div>
+        <div class="value">{{ stats.critical_issues }}</div>
     </div>
     <div class="stat-card medium">
-        <div class="value">{{ stats.medium_issues }}</div>
         <div class="label">Medium Risk</div>
+        <div class="value">{{ stats.medium_issues }}</div>
     </div>
 </div>
 <div class="panel">
-    <div class="panel-header"><h2>Recent Scan Activity</h2></div>
+    <div class="panel-header">
+        <h2>Recent Activity</h2>
+    </div>
     <table class="results-table">
         <thead>
-            <tr><th>Scan ID</th><th>Target</th><th>Status</th><th>Vulnerabilities</th><th>Date</th><th>Actions</th></tr>
+            <tr>
+                <th>Scan ID</th>
+                <th>Target</th>
+                <th>Vulnerabilities</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
             {% for scan in recent_scans %}
             <tr>
-                <td>{{ scan.scan_id }}</td>
+                <td><span style="font-family: monospace; color: var(--accent-blue);">{{ scan.scan_id }}</span></td>
                 <td>{{ scan.target }}</td>
-                <td>Completed</td>
-                <td>{{ scan.summary.critical }} Critical, {{ scan.summary.medium }} Medium</td>
+                <td>
+                    {% if scan.summary.critical > 0 %}
+                        <span class="severity-badge severity-critical">{{ scan.summary.critical }} Critical</span>
+                    {% elif scan.summary.medium > 0 %}
+                        <span class="severity-badge severity-medium">{{ scan.summary.medium }} Medium</span>
+                    {% else %}
+                        <span class="severity-badge severity-low">Clean</span>
+                    {% endif %}
+                </td>
                 <td>{{ scan.timestamp }}</td>
-                <td><a href="{{ url_for('view_report', filename=scan.filename) }}">View</a></td>
+                <td>
+                    <a href="{{ url_for('view_report', id=scan.id) }}" class="btn" style="padding: 0.4rem 1rem; font-size: 0.8rem; background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border-color); text-decoration: none;">View</a>
+                </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted);">No scans have been run yet.</td>
+                <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                    No scans performed yet. Start a new scan to see data.
+                </td>
             </tr>
             {% endfor %}
         </tbody>

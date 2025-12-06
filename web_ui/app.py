@@ -1,87 +1,180 @@
 import sys
 import os
 import json
+import tempfile
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
-# --- Connect the Real Scanner ---
-# This adds the project's root directory to the Python path
-# so we can import modules from the 'scanner' folder.
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+# --- PATH SETUP ---
+# Ensure we can find the scanner module
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from scanner.integration import run_scan
 
-# --- Flask App Configuration ---
-app = Flask(__name__,
-            static_folder='static',
-            template_folder='templates')
+# --- APP CONFIGURATION ---
+app = Flask(__name__)
+app.secret_key = 'winscan_secret_key_change_this' 
 
-# Create a 'reports' directory inside 'web_ui' to save scan results
-REPORTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'reports')
-os.makedirs(REPORTS_DIR, exist_ok=True)
+# Database Config
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///winscan.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# --- Helper Function to Read Saved Reports ---
-def get_all_scan_data():
-    """Reads all saved JSON reports from the reports directory."""
-    all_reports = []
-    if not os.path.exists(REPORTS_DIR):
-        return all_reports
+db = SQLAlchemy(app)
 
-    # Sort files by name to show the newest reports first
-    for filename in sorted(os.listdir(REPORTS_DIR), reverse=True):
-        if filename.endswith(".json"):
-            report_path = os.path.join(REPORTS_DIR, filename)
-            try:
-                with open(report_path, 'r') as f:
-                    data = json.load(f)
-                    data['filename'] = filename  # Add filename for creating links
-                    all_reports.append(data)
-            except (json.JSONDecodeError, IOError):
-                print(f"Warning: Could not read or parse report file: {filename}")
-                continue
-    return all_reports
+# --- CONFIG LOADER ---
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
 
-# --- Flask Routes for Your UI ---
+def load_config():
+    defaults = {"smb_anon": True, "smb_v1": True, "winrm_hotfix": True, "rdp_open": False, "smb_signing": False}
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, 'r') as f:
+                return {**defaults, **json.load(f)}
+        except:
+            pass
+    return defaults
 
+def save_config(config):
+    with open(CONFIG_PATH, 'w') as f:
+        json.dump(config, f, indent=4)
+
+# --- DATABASE MODELS ---
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    reports = db.relationship('ScanReport', backref='author', lazy=True)
+
+class ScanReport(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    scan_id = db.Column(db.String(50))
+    target = db.Column(db.String(100))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    summary_critical = db.Column(db.Integer)
+    summary_medium = db.Column(db.Integer)
+    full_json = db.Column(db.Text) 
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+# --- LOGIN MANAGER ---
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+# --- AUTH ROUTES ---
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username).first()
+        
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password', 'error')
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists.', 'error')
+            return redirect(url_for('register'))
+            
+        # [FIX] Removed incompatible method='sha256'
+        hashed_pw = generate_password_hash(password)
+        
+        new_user = User(username=username, password=hashed_pw)
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+        return redirect(url_for('dashboard'))
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# --- MAIN ROUTES ---
 @app.route('/')
 def get_started():
-    """Renders the initial 'Get Started' landing page."""
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     return render_template('get_started.html')
 
+# [FIX] Restored missing loader route
 @app.route('/loader')
 def loader():
-    """Renders the loading screen that redirects to the dashboard."""
     return render_template('loader.html')
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
-    """Displays the main dashboard with aggregated stats and recent scans."""
-    all_reports = get_all_scan_data()
-    stats = {
-        "total_scans": len(all_reports), "hosts_scanned": 0,
-        "critical_issues": 0, "medium_issues": 0
-    }
-    # Aggregate stats from all saved report summaries
-    for report in all_reports:
-        summary = report.get("summary", {})
-        stats["hosts_scanned"] += summary.get("hosts_scanned", 0)
-        stats["critical_issues"] += summary.get("critical", 0)
-        stats["medium_issues"] += summary.get("medium", 0)
+    # 1. Get Raw Data from DB
+    user_reports = ScanReport.query.filter_by(user_id=current_user.id).order_by(ScanReport.timestamp.desc()).all()
+    
+    # 2. [CRITICAL FIX] Convert to Dictionary to satisfy HTML template
+    clean_reports = []
+    for r in user_reports:
+        clean_reports.append({
+            "id": r.id,
+            "scan_id": r.scan_id,
+            "target": r.target,
+            "timestamp": r.timestamp,
+            # We explicitly create the 'summary' object the HTML is looking for
+            "summary": {
+                "critical": r.summary_critical,
+                "medium": r.summary_medium,
+                "hosts_scanned": 1
+            },
+            "filename": r.id # Fallback for old links
+        })
 
-    recent_scans = all_reports[:5]  # Get the 5 most recent scans for the table
-    return render_template('dashboard.html', stats=stats, recent_scans=recent_scans)
+    stats = {
+        "total_scans": len(user_reports),
+        "critical_issues": sum(r.summary_critical for r in user_reports),
+        "medium_issues": sum(r.summary_medium for r in user_reports)
+    }
+    
+    # 3. Pass the CLEAN list, NOT the raw 'user_reports'
+    return render_template('dashboard.html', stats=stats, recent_scans=clean_reports[:5])
 
 @app.route('/new_scan')
+@login_required
 def new_scan():
-    """Displays the form to start a new vulnerability scan."""
     return render_template('new_scan.html')
 
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    config = load_config()
+    if request.method == 'POST':
+        new_config = {
+            "smb_anon": request.form.get('smb_anon') == 'on',
+            "smb_v1": request.form.get('smb_v1') == 'on',
+            "winrm_hotfix": request.form.get('winrm_hotfix') == 'on',
+            "rdp_open": request.form.get('rdp_open') == 'on',
+            "smb_signing": request.form.get('smb_signing') == 'on'
+        }
+        save_config(new_config)
+        return redirect(url_for('settings'))
+    return render_template('settings.html', config=config)
+
 @app.route('/run_scan', methods=['POST'])
+@login_required
 def run_scan_route():
-    """
-    Handles the new scan form, calls the real scanner, saves the results,
-    and redirects the user to the detailed report page.
-    """
-    # 1. Get all data from the HTML form in 'new_scan.html'
     targets = request.form.get('targets')
     profile = request.form.get('profile')
     username = request.form.get('username')
@@ -91,73 +184,72 @@ def run_scan_route():
     if profile == 'deep':
         start_port = request.form.get('start_port')
         end_port = request.form.get('end_port')
-        # Nmap can accept a range like "1-1024"
         if start_port and end_port:
             custom_ports = f"{start_port}-{end_port}"
-        else:
-            return "Error: Deep profile selected but no port range was provided.", 400
 
-    # 2. Call the REAL scanner function from integration.py
-    real_results = run_scan(
-        targets=targets,
-        profile=profile,
-        custom_ports=custom_ports,
-        username=username,
-        password=password
+    real_results = run_scan(targets, profile, custom_ports, username, password)
+
+    crit_count = sum(1 for r in real_results if r.get('severity') == 'Critical')
+    med_count = sum(1 for r in real_results if r.get('severity') == 'Medium')
+    
+    new_report = ScanReport(
+        scan_id=f"SC-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
+        target=targets,
+        timestamp=datetime.now(),
+        summary_critical=crit_count,
+        summary_medium=med_count,
+        full_json=json.dumps(real_results),
+        author=current_user
     )
-
-    # 3. Create the report data from the REAL results
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    report_filename = f"scan_report_{timestamp}.json"
-    report_path = os.path.join(REPORTS_DIR, report_filename)
-
-    # Calculate a real summary from the scanner's output
-    summary = {
-        "hosts_scanned": len(set(r['host'] for r in real_results if 'host' in r)),
-        "critical": sum(1 for r in real_results if r.get('severity') == 'Critical'),
-        "high": sum(1 for r in real_results if r.get('severity') == 'High'),
-        "medium": sum(1 for r in real_results if r.get('severity') == 'Medium'),
-        "low": sum(1 for r in real_results if r.get('severity') == 'Low'),
-    }
-
-    report_data = {
-        "scan_id": f"SC-{timestamp.replace('_', '-')}",
-        "target": targets,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "summary": summary,
-        "results": real_results
-    }
-
-    # 4. Save the report to a JSON file and redirect to view it
-    with open(report_path, 'w') as f:
-        json.dump(report_data, f, indent=4)
-        
-    return redirect(url_for('view_report', filename=report_filename))
+    
+    db.session.add(new_report)
+    db.session.commit()
+    
+    return redirect(url_for('view_report', id=new_report.id))
 
 @app.route('/reports')
+@login_required
 def reports():
-    """Shows a list of all past scan reports."""
-    all_reports = get_all_scan_data()
-    # The template expects a flat list of all vulnerabilities
+    user_reports = ScanReport.query.filter_by(user_id=current_user.id).order_by(ScanReport.timestamp.desc()).all()
     all_vulnerabilities = []
-    for report in all_reports:
-        for result in report.get("results", []):
-            if result.get("status") == "FAIL":
-                all_vulnerabilities.append(result)
+    for report in user_reports:
+        results = json.loads(report.full_json)
+        for res in results:
+            if res.get('status') == 'FAIL':
+                all_vulnerabilities.append(res)
     return render_template('reports.html', vulnerabilities=all_vulnerabilities)
 
-@app.route('/report/<filename>')
-def view_report(filename):
-    """Displays the detailed results for a single scan report."""
-    report_path = os.path.join(REPORTS_DIR, filename)
-    try:
-        with open(report_path, 'r') as f:
-            data = json.load(f)
-        return render_template('results.html', data=data)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return "Report not found or is corrupted.", 404
+# [FIX] Route now accepts 'id', matching the database structure
+@app.route('/report/<int:id>')
+@login_required
+def view_report(id):
+    report = ScanReport.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    data = {
+        "scan_id": report.scan_id,
+        "target": report.target,
+        "results": json.loads(report.full_json),
+        "summary": { "critical": report.summary_critical, "medium": report.summary_medium }
+    }
+    # Pass 'report_id' so the download button works
+    return render_template('results.html', data=data, report_id=report.id)
 
-# --- Main execution point ---
+@app.route('/download/<int:id>')
+@login_required
+def download_report(id):
+    report = ScanReport.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    data = {
+        "scan_id": report.scan_id,
+        "target": report.target,
+        "results": json.loads(report.full_json),
+        "summary": { "critical": report.summary_critical, "medium": report.summary_medium }
+    }
+    html_content = render_template('results.html', data=data)
+    fd, path = tempfile.mkstemp(suffix='.html')
+    with os.fdopen(fd, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    return send_from_directory(os.path.dirname(path), os.path.basename(path), as_attachment=True, download_name=f"{report.scan_id}.html")
+
 if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
     app.run(debug=True, host='0.0.0.0', port=5000)
-

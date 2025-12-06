@@ -225,6 +225,8 @@ class Scanner:
 
     # --- Main Orchestration ---
     
+    # --- Main Orchestration ---
+    
     def run(self, profile='safe', custom_ports=None):
         """
         The main public method to orchestrate the scan.
@@ -239,24 +241,32 @@ class Scanner:
             print(f"  [!] No open ports found for {self.target}.")
             return self.results
 
+        # Flags to ensure plugins only run once per host
+        smb_scanned = False
+        winrm_scanned = False
+        rdp_scanned = False
+
         # This is the "Plugin Engine"
         for port, service in self.open_ports.items():
 
-            # Run SMB plugins
-            if port in (139, 445) or 'microsoft-ds' in service or 'netbios-ssn' in service:
+            # Run SMB plugins (Check if we haven't scanned SMB yet)
+            if (port in (139, 445) or 'microsoft-ds' in service or 'netbios-ssn' in service) and not smb_scanned:
                 print(f"  [>] Running SMB plugins on port {port}...")
                 self._check_smb_anon_shares()
                 self._check_smb_v1()
-                self._check_smb_signing() # <-- NEWLY ADDED
+                self._check_smb_signing()
+                smb_scanned = True # Mark as done
 
-            # Run WinRM plugin
-            if port in (5985, 5986) or 'wsman' in service or 'winrm' in service:
+            # Run WinRM plugin (Check if we haven't scanned WinRM yet)
+            if (port in (5985, 5986) or 'wsman' in service or 'winrm' in service) and not winrm_scanned:
                 print(f"  [>] Running WinRM plugins on port {port}...")
                 self._check_winrm_hotfixes(port)
+                winrm_scanned = True # Mark as done
 
-            # Run RDP plugin
-            if port == 3389 or 'ms-wbt-server' in service: # <-- NEWLY ADDED
+            # Run RDP plugin (Check if we haven't scanned RDP yet)
+            if (port == 3389 or 'ms-wbt-server' in service) and not rdp_scanned:
                 print(f"  [>] Running RDP plugins on port {port}...")
-                self._check_rdp_open() # <-- NEWLY ADDED
+                self._check_rdp_open()
+                rdp_scanned = True # Mark as done
 
         return self.results
