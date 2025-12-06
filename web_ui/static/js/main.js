@@ -1,4 +1,4 @@
-// web_ui/static/js/main.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const profileSelect = document.getElementById('profile');
     if (profileSelect) {
