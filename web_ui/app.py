@@ -118,23 +118,10 @@ def register():
             
         hashed_pw = generate_password_hash(password)
         
-        # Insert into MongoDB
-        result = mongo.db.users.insert_one({"username": username, "email": email, "password": hashed_pw, "is_verified": False})
+        # Insert into MongoDB (Auto-verifying because Render free tier blocks SMTP)
+        result = mongo.db.users.insert_one({"username": username, "email": email, "password": hashed_pw, "is_verified": True})
         
-        # Send verification email
-        token = serializer.dumps(email, salt='email-confirm-salt')
-        confirm_url = url_for('confirm_email', token=token, _external=True)
-        
-        msg = Message("Confirm your WinScan Pro Account", recipients=[email])
-        msg.html = f"<p>Welcome to WinScan Pro!</p><p>Please verify your account by clicking the link below:</p><p><a href='{confirm_url}'>Verify Your Account</a></p>"
-        
-        try:
-            mail.send(msg)
-            flash('A confirmation email has been sent to your address. Please check your inbox.', 'success')
-        except Exception as e:
-            flash('Account created, but failed to send verification email. SMTP may not be configured.', 'error')
-            print(f"Error sending email: {e}")
-            
+        flash('Account created successfully! You can now log in.', 'success')
         return redirect(url_for('login'))
         
     return render_template('register.html')
@@ -270,8 +257,8 @@ def run_scan_route():
             msg = Message(f"WinScan Pro Report: {new_report['scan_id']}", recipients=[current_user.email])
             # Render the same exact HTML template we use for the web view
             msg.html = render_template('results.html', data=data) 
-            mail.send(msg)
-            print(f"[+] Sent report email to {current_user.email}")
+            # mail.send(msg)  # Disabled: Render Free tier blocks SMTP ports
+            print(f"[+] Skipping report email to {current_user.email} (SMTP blocked)")
         except Exception as e:
             print(f"[!] Failed to send report email: {e}")
             
