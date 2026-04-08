@@ -15,10 +15,16 @@
                 <h3 class="report-title">{{ vuln.vulnerability }}</h3>
             </div>
             <p class="report-details">Detected on host: {{ vuln.host }}</p>
-            <p class="report-recommendation"><b>Recommendation:</b> Check the detailed scan report for remediation steps.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                <p class="report-recommendation" style="margin: 0;"><b>Recommendation:</b> Check the detailed scan report for remediation steps.</p>
+                <a href="{{ url_for('view_report', id=vuln.report_id) }}" class="btn btn-outline btn-sm">View Full Scan</a>
+            </div>
         </div>
         {% else %}
-        <p style="text-align: center; color: var(--text-muted);">No critical or medium vulnerabilities found across all scans.</p>
+        <div class="empty-state">
+            <div class="empty-state-icon">🛡️</div>
+            <p>No critical or medium vulnerabilities found across all scans.</p>
+        </div>
         {% endfor %}
     </div>
 </div>

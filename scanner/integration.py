@@ -5,7 +5,7 @@ import sys
 import argparse
 from .scanner import Scanner
 
-def run_scan(targets, profile, custom_ports=None, username=None, password=None):
+def run_scan(targets, profile, custom_ports=None, username=None, password=None, enabled_plugins=None):
     """
     Acts as the main bridge between the web UI and the backend scanner.
 
@@ -43,7 +43,8 @@ def run_scan(targets, profile, custom_ports=None, username=None, password=None):
             
             results = s.run(
                 profile=profile,
-                custom_ports=custom_ports
+                custom_ports=custom_ports,
+                enabled_plugins=enabled_plugins
             )
             
             all_results.extend(results)

@@ -3,11 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WinScan Pro</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/main.css') }}"
-    />
+    <title>{% block title %}WinScan Pro{% endblock %}</title>
+    <meta name="description" content="WinScan Pro — Professional Windows Vulnerability Scanner">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   </head>
   <body>
     <div class="layout-wrapper">
@@ -25,14 +23,12 @@
                 <li class="nav-item {% if request.path == url_for('new_scan') %}active{% endif %}">
                     <a href="{{ url_for('new_scan') }}"><img src="{{ url_for('static', filename='images/new_scan.svg') }}" class="icon">New Scan</a>
                 </li>
-                <li class="nav-item {% if 'report' in request.path and request.path != url_for('reports') %}active{% endif %}">
-                     <a href="#"><img src="{{ url_for('static', filename='images/reports.svg') }}" class="icon">Scan Result</a>
-                </li>
+
                 <li class="nav-item {% if request.path == url_for('reports') %}active{% endif %}">
                     <a href="{{ url_for('reports') }}"><img src="{{ url_for('static', filename='images/settings.svg') }}" class="icon">Reports</a>
                 </li>
             </ul>
-            <ul class="sidebar-nav">
+            <ul class="sidebar-nav" style="margin-top: auto;">
                 <div class="nav-category">Settings</div>
                 <li class="nav-item {% if request.path == url_for('settings') %}active{% endif %}">
                     <a href="{{ url_for('settings') }}">
@@ -40,8 +36,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url_for('logout') }}" style="color: var(--critical);">
-                        <span class="icon" style="background: var(--critical); border-radius: 50%; width: 8px; height: 8px; display: inline-block;"></span>
+                    <a href="{{ url_for('logout') }}">
+                        <span class="logout-dot"></span>
                         Logout
                     </a>
                 </li>
@@ -49,7 +45,7 @@
         </nav>
         {% endif %}
 
-        <main class="main-content" style="{% if not current_user.is_authenticated %}margin: 0; padding: 0; width: 100%;{% endif %}">
+        <main class="main-content" {% if not current_user.is_authenticated %}style="margin: 0; padding: 0; width: 100%;"{% endif %}>
             {% block content %}{% endblock %}
         </main>
     </div>

@@ -1,4 +1,5 @@
-import nmap
+import socket
+import concurrent.futures
 import winrm
 # --- Import fixes applied ---
 from impacket.smbconnection import SMBConnection
@@ -13,7 +14,6 @@ class Scanner:
         self.target = target
         self.credentials = credentials if credentials else {}
         self.results = [] # A list to store result dictionaries
-        self.nm = nmap.PortScanner()
         self.open_ports = {} # Discovered ports: {445: 'smb', 5985: 'winrm'}
 
     def _add_result(self, vulnerability, status, severity, details, recommendation):
@@ -29,50 +29,53 @@ class Scanner:
 
     def _discover_ports(self, profile, custom_ports):
         """
-        Uses python-nmap to scan for open ports based on the profile.
-        
-        ⚠️ GOTCHA: This requires the Nmap binary to be installed
-        on the machine running the Python script!
+        Uses Python's built-in socket library to scan for open ports.
+        This completely eliminates the need for an external Nmap installation.
         """
         print(f"  [>] Discovering ports on {self.target} (Profile: {profile})")
         
-        ports_to_scan = ''
-        nmap_args = '-sV' # -sV: Probe open ports to determine service/version info
+        target_ports = []
 
         if profile == 'deep':
             if not custom_ports:
                 raise ValueError("Deep profile selected but no custom ports provided.")
-            ports_to_scan = custom_ports
-            print(f"  [>] Deep scan configured for ports: {ports_to_scan}")
+            print(f"  [>] Deep scan configured for ports: {custom_ports}")
+            # Parse custom ports (e.g. "80,443", "1-1000", or "80")
+            for p in custom_ports.split(','):
+                p = p.strip()
+                if '-' in p:
+                    start, end = map(int, p.split('-'))
+                    target_ports.extend(range(start, end + 1))
+                else:
+                    target_ports.append(int(p))
         else: # 'safe' profile
-            # We scan the default top 1000 ports + our key ports
-            ports_to_scan = '139,445,5985,5986'
-            print(f"  [>] Safe scan configured for common ports + Nmap top 1000.")
+            print(f"  [>] Safe scan configured for common ports.")
+            target_ports = [139, 445, 3389, 5985, 5986]
 
-        try:
-            self.nm.scan(self.target, ports_to_scan, arguments=nmap_args, timeout=300)
-        except nmap.PortScannerError as e:
-            print(f"  [!] Nmap error: {e}")
-            raise Exception(f"Nmap failed. Is it installed and in your PATH? Error: {e}")
-        except Exception as e:
-            print(f"  [!] Unknown error during port scan: {e}")
-            raise Exception(f"Port scan failed: {e}")
+        # Simple port to service mapping since we aren't using Nmap anymore
+        service_map = {
+            139: 'netbios-ssn',
+            445: 'microsoft-ds',
+            3389: 'ms-wbt-server',
+            5985: 'wsman',
+            5986: 'wsman-ssl'
+        }
 
-        if self.target not in self.nm.all_hosts():
-            print(f"  [!] Host {self.target} seems to be down.")
-            return
+        # Multi-threaded port scanner for speed
+        def scan_port(port):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1.5) # 1.5 second timeout
+                if s.connect_ex((self.target, port)) == 0:
+                    service = service_map.get(port, 'tcp')
+                    print(f"  [+] Found open port: {port}/tcp ({service})")
+                    return port, service
+            return None, None
 
-        # Populate self.open_ports
-        for proto in self.nm[self.target].all_protocols():
-            if proto != 'tcp':
-                continue
-            
-            lport = self.nm[self.target][proto].keys()
-            for port in lport:
-                state = self.nm[self.target][proto][port]['state']
-                if state == 'open':
-                    service = self.nm[self.target][proto][port]['name']
-                    print(f"  [+] Found open port: {port}/{proto} ({service})")
+        with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+            futures = [executor.submit(scan_port, port) for port in target_ports]
+            for future in concurrent.futures.as_completed(futures):
+                port, service = future.result()
+                if port:
                     self.open_ports[port] = service
 
     # --- PLUGIN 1: SMB Anonymous Shares ---
@@ -227,7 +230,7 @@ class Scanner:
     
     # --- Main Orchestration ---
     
-    def run(self, profile='safe', custom_ports=None):
+    def run(self, profile='safe', custom_ports=None, enabled_plugins=None):
         """
         The main public method to orchestrate the scan.
         """
@@ -252,21 +255,26 @@ class Scanner:
             # Run SMB plugins (Check if we haven't scanned SMB yet)
             if (port in (139, 445) or 'microsoft-ds' in service or 'netbios-ssn' in service) and not smb_scanned:
                 print(f"  [>] Running SMB plugins on port {port}...")
-                self._check_smb_anon_shares()
-                self._check_smb_v1()
-                self._check_smb_signing()
+                if enabled_plugins is None or enabled_plugins.get('smb_anon', True):
+                    self._check_smb_anon_shares()
+                if enabled_plugins is None or enabled_plugins.get('smb_v1', True):
+                    self._check_smb_v1()
+                if enabled_plugins is None or enabled_plugins.get('smb_signing', True):
+                    self._check_smb_signing()
                 smb_scanned = True # Mark as done
 
             # Run WinRM plugin (Check if we haven't scanned WinRM yet)
             if (port in (5985, 5986) or 'wsman' in service or 'winrm' in service) and not winrm_scanned:
                 print(f"  [>] Running WinRM plugins on port {port}...")
-                self._check_winrm_hotfixes(port)
+                if enabled_plugins is None or enabled_plugins.get('winrm_hotfix', True):
+                    self._check_winrm_hotfixes(port)
                 winrm_scanned = True # Mark as done
 
             # Run RDP plugin (Check if we haven't scanned RDP yet)
             if (port == 3389 or 'ms-wbt-server' in service) and not rdp_scanned:
                 print(f"  [>] Running RDP plugins on port {port}...")
-                self._check_rdp_open()
+                if enabled_plugins is None or enabled_plugins.get('rdp_open', True):
+                    self._check_rdp_open()
                 rdp_scanned = True # Mark as done
 
         return self.results

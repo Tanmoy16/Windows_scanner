@@ -9,39 +9,37 @@
     <div class="scan-config-grid">
         <div class="panel">
             <div class="panel-header"><h2>Scan Configuration</h2></div>
-            <div class="form-group">
-                <label for="targets">Target IP Addresses or Ranges</label>
-                <textarea id="targets" name="targets" rows="4" placeholder="Enter IP addresses, CIDR ranges, or IP ranges (one per line)"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="profile">Scan Profile</label>
-                <select id="profile" name="profile">
-                    <option value="safe">Safe Scan (Top 1000 ports)</option>
-                    <option value="deep">Deep Scan (Custom Port Range)</option>
-                </select>
-            </div>
-            <div class="form-group" id="ports-group" style="display: none;">
-                <label>Custom Port Range</label>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <input type="number" id="start_port" name="start_port" placeholder="Start Port" min="1" max="65535">
-                    <span>-</span>
-                    <input type="number" id="end_port" name="end_port" placeholder="End Port" min="1" max="65535">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="targets">Target IP Addresses or Ranges</label>
+                    <textarea id="targets" name="targets" rows="4" placeholder="Enter IP addresses, CIDR ranges, or IP ranges (one per line)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="profile">Scan Profile</label>
+                    <select id="profile" name="profile">
+                        <option value="safe">Safe Scan (Top 1000 ports)</option>
+                        <option value="deep">Deep Scan (Custom Port Range)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="ports-group" style="display: none;">
+                    <label>Custom Port Range</label>
+                    <div class="port-range-flex">
+                        <input type="number" id="start_port" name="start_port" placeholder="Start Port" min="1" max="65535">
+                        <span>-</span>
+                        <input type="number" id="end_port" name="end_port" placeholder="End Port" min="1" max="65535">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Authentication (Optional)</label>
+                    <input type="text" name="username" placeholder="Username" style="margin-bottom: 0.5rem;">
+                    <input type="password" name="password" placeholder="Password">
+                    <small>Required for WinRM-based vulnerability checks</small>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Authentication (Optional)</label>
-                <input type="text" name="username" placeholder="Username" style="margin-bottom: 0.5rem;">
-                <input type="password" name="password" placeholder="Password">
-                <small>Required for WinRM-based vulnerability checks</small>
-            </div>
-        </div>
-    
-            
         </div>
     </div>
     <div class="action-buttons">
         <button type="submit" class="btn btn-primary">Start Scan</button>
-        
     </div>
 </form>
 {% endblock %}

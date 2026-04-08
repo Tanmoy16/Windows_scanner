@@ -1,39 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Register - WinScan Pro{% endblock %}
 {% block content %}
-<div class="page-center-container" style="height: 100vh; background: radial-gradient(circle at center, #1c2128 0%, #0f1115 100%);">
-    
-    <div class="panel" style="width: 100%; max-width: 420px; padding: 2.5rem; border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
-        
-        <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 2rem; text-align: center;">
-            <div class="logo-icon" style="width: 60px; height: 60px; font-size: 2rem; margin-bottom: 1rem;">W</div>
-            <h2 style="margin: 0; font-size: 1.8rem; color: white;">Create Account</h2>
-            <p style="color: var(--text-muted); margin-top: 0.5rem;">Setup your scanner profile</p>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="logo-icon">W</div>
+            <h2>Create Account</h2>
+            <p>Set up your scanner profile</p>
         </div>
 
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div style="background: rgba(248, 81, 73, 0.1); border: 1px solid #f85149; color: #f85149; padding: 0.8rem; border-radius: 6px; margin-bottom: 1.5rem; text-align: center;">
-                    {{ messages[0] }}
-                </div>
+                <div class="flash-message">{{ messages[0] }}</div>
             {% endif %}
         {% endwith %}
 
-        <form method="POST">
+        <form method="POST" class="auth-form">
             <div class="form-group">
                 <label>Choose Username</label>
-                <input type="text" name="username" required placeholder="username">
+                <input type="text" name="username" required placeholder="Enter a username">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" required placeholder="Enter your email address">
             </div>
             <div class="form-group">
                 <label>Choose Password</label>
-                <input type="password" name="password" required placeholder="password">
+                <input type="password" name="password" required placeholder="Create a password">
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 1rem;">Sign Up</button>
+            <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
         </form>
-        
-        <div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">Already have an account?</p>
-            <a href="{{ url_for('login') }}" style="color: var(--accent-blue); text-decoration: none; font-weight: 500;">Back to Login</a>
+
+        <div class="auth-divider">
+            <p>Already have an account?</p>
+            <a href="{{ url_for('login') }}">Back to Login</a>
         </div>
     </div>
 </div>

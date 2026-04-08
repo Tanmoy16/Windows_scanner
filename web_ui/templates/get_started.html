@@ -3,17 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinScan Pro</title>
+    <title>WinScan Pro — Windows Vulnerability Scanner</title>
+    <meta name="description" content="Professional agentless Windows vulnerability scanner. Detect SMB, WinRM, and RDP security issues across your network.">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
-    <div class="page-center-container">
-        <div class="logo-title">
-            <span class="logo-icon">W</span>
-            <span>WinScan Pro</span>
+    <div class="landing-page">
+        <div class="landing-hero">
+            <div class="landing-hero-content">
+                <div class="landing-logo">
+                    <div class="logo-icon">W</div>
+                    <span class="landing-logo-text">WinScan Pro</span>
+                </div>
+                <p class="landing-tagline">
+                    Agentless vulnerability scanning for Windows systems.
+                    Detect misconfigurations, missing patches, and security risks — all from one dashboard.
+                </p>
+                <div class="landing-cta">
+                    <button id="get-started-btn" class="btn btn-primary">Get Started</button>
+                </div>
+            </div>
         </div>
-        <button id="get-started-btn" class="start-button">Get Started</button>
+
+        <div class="landing-features">
+            <div class="feature-card">
+                <div class="feature-icon scan">🔍</div>
+                <h3>Deep Scanning</h3>
+                <p>Scan SMB, WinRM, and RDP services across your entire network with custom port ranges.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon shield">🛡️</div>
+                <h3>Vulnerability Detection</h3>
+                <p>Identify SMBv1, anonymous shares, weak signing, missing patches, and open RDP access.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon report">📊</div>
+                <h3>Detailed Reports</h3>
+                <p>Generate downloadable reports with severity ratings and actionable recommendations.</p>
+            </div>
+        </div>
+
+        <div class="landing-footer">
+            &copy; 2026 WinScan Pro &middot; Built for network security professionals
+        </div>
     </div>
+
     <script>
         document.getElementById('get-started-btn').addEventListener('click', () => {
             window.location.href = "{{ url_for('loader') }}";

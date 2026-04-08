@@ -2,7 +2,10 @@ flask
 flask-sqlalchemy
 flask-login
 werkzeug
-python-nmap
 pywinrm
 impacket
 gunicorn
+pymongo
+flask-pymongo
+Flask-Mail
+Flask-Limiter

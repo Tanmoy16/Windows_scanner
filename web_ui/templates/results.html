@@ -6,11 +6,9 @@
         <h1>Scan Results</h1>
         <p>Detailed vulnerability findings for Scan ID: <strong>{{ data.scan_id }}</strong></p>
     </div>
-    {% if report_id %}
-    <a href="{{ url_for('download_report', id=report_id) }}" class="btn btn-primary" style="text-decoration: none;">
+    <button onclick="downloadPDF()" class="btn btn-primary">
         Download Report
-    </a>
-    {% endif %}
+    </button>
 </div>
 
 <div class="panel">
@@ -25,7 +23,7 @@
             <div class="label">Medium Issues</div>
         </div>
     </div>
-    <div class="panel-header" style="margin-top: 2rem;"><h2>Details</h2></div>
+    <div class="panel-header"><h2>Details</h2></div>
     <table class="results-table">
         <thead>
             <tr><th>Host</th><th>Vulnerability</th><th>Status</th><th>Severity</th><th>Details</th></tr>
@@ -37,14 +35,35 @@
                 <td>{{ result.vulnerability }}</td>
                 <td><span class="status-badge status-{{ result.status.lower() }}">{{ result.status }}</span></td>
                 <td><span class="severity-badge severity-{{ result.severity.lower() }}">{{ result.severity }}</span></td>
-                <td style="font-size: 0.9rem; color: var(--text-muted);">{{ result.details }}</td>
+                <td style="font-size: 0.85rem; color: var(--text-secondary);">{{ result.details }}</td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-muted);">No vulnerabilities were found in this scan.</td>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>No vulnerabilities were found in this scan.</p>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<!-- html2pdf.js via CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadPDF() {
+    var element = document.querySelector('.panel');
+    var opt = {
+        margin:       0.5,
+        filename:     'Scan_Report_{{ data.scan_id }}.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+</script>
 {% endblock %}

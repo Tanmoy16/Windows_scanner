@@ -1,8 +1,7 @@
 # Use a lightweight Python image
 FROM python:3.10-slim
 
-# 1. Install Nmap (Required for the scanner to work)
-RUN apt-get update && apt-get install -y nmap && rm -rf /var/lib/apt/lists/*
+# No external dependencies required anymore
 
 # Set the working directory
 WORKDIR /app
