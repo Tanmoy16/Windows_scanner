@@ -15,5 +15,6 @@ RUN pip install gunicorn  # Install production server
 COPY . .
 
 # 4. Run the application using Gunicorn
+EXPOSE 10000
 # 'web_ui.app:app' means: look in folder 'web_ui', file 'app.py', for the object 'app'
 CMD ["gunicorn", "--bind", "0.0.0.0:10000", "web_ui.app:app"]
