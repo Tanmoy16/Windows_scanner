@@ -22,8 +22,9 @@ app = Flask(__name__)
 app.secret_key = '018b3d6faba6dcb78297b8721c5f3a09b45db71e98d' # Cryptographically strong static key 
 
 # MongoDB Config (Local MongoDB)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/winscan_db"
+app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/winscan_db")
 mongo = PyMongo(app)
+
 
 # Rate Limiter
 limiter = Limiter(get_remote_address, app=app, default_limits=["200 per day"])
